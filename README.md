@@ -10,4 +10,4 @@ control device. You can run this server on a Raspberry PI which is in the same n
 
 
 ## SETUP
->git clone https://github.com/mrtayguney/snapremote-server.git
+`git clone https://github.com/mrtayguney/snapremote-server.git`
