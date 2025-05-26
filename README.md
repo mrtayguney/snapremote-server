@@ -101,8 +101,20 @@ To create gcode files that you can use in the Snapmaker device's screen and incl
 readable by your device, you need to add some print related data to your gcode file. For this I created a post process
 script to do that in OrcaSlicer every time you create a gcode file.
 
->The post process file;
-> https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png
+> **The post process file;**
+> 
+> https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/post_process/convert.py
+
+Download the file in an accessible folder in your computer and then in the OrcaSlicer go to Others tab in your preset settings. Locate the Post-processing Scripts at the bottom. Write down the code bellow;
+
+```
+/usr/bin/python3 [path_to]/convert.py;
+```
+
+![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png "Logo Title Text 1")
+![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png "Logo Title Text 1")
+
+
 
 
 
