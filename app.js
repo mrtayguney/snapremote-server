@@ -386,7 +386,8 @@ app.post("/move", authCheck, (request, response) => {
     }
     channel.move(request.body).then((resp) => {
         const status = {
-            "Status": "OK"
+            "Status": "OK",
+            "Response": JSON.stringify({})
         };
         response.send(status);
     })
