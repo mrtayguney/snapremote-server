@@ -79,17 +79,31 @@ click connect. The server is going to connect to the Snapmaker device and you re
 > progress, total layer lines and etc.. So all the system is optimized for using with the OrcaSlicer. The gcode files
 > exported from the other slicers may not work correctly.
 
-### Orca Slicer Configuration
+### OrcaSlicer Configuration
+
 In OrcaSlicer you click symbol next to your printer;
 
 ![orca connection](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect.png "Logo Title Text 1")
 
 In the modal opened, Select 'Octo/Klipper' as Host Type and fill Hostname IP with your server address, like;
->**http://[YOUR_SERVER_IP]:[YOUR_PORT]**
+
+```
+http://[YOUR_SERVER_IP]:[YOUR_PORT]
+```
 
 Then you can click Test to test your connection. If it is ok, you can click OK button bellow to finish configuration.
 
 ![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png "Logo Title Text 1")
+
+### OrcaSlicer Post Process
+
+To create gcode files that you can use in the Snapmaker device's screen and include all the information that can
+readable by your device, you need to add some print related data to your gcode file. For this I created a post process
+script to do that in OrcaSlicer every time you create a gcode file.
+
+>The post process file;
+> https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png
+
 
 
 > ## BE AWARE
