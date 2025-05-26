@@ -107,11 +107,17 @@ script to do that in OrcaSlicer every time you create a gcode file.
 
 Download the file in an accessible folder in your computer and then in the OrcaSlicer go to Others tab in your preset settings. Locate the Post-processing Scripts at the bottom. Write down the code bellow;
 
+**For MAC;**
 ```
-/usr/bin/python3 [path_to]/convert.py;
+/path/to/python3 /path/to/convert.py;
 ```
 
-![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/post.png "Logo Title Text 1")
+**For Windows;**
+```
+C:\Program Files\Python39\python.exe” D:\path\to\convert.py
+```
+
+![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post.png?raw=true "Logo Title Text 1")
 ![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post2.png?raw=true "Logo Title Text 1")
 
 
