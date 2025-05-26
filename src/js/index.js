@@ -667,7 +667,7 @@ document.addEventListener('alpine:init', () => {
     });
 
     Alpine.store('machine_status', {
-        status: "",
+        status: "idle",
         set(status) {
             this.status = status;
         }
