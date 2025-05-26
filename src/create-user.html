@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SnapRemote Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+</head>
+<body class="login-body">
+<div class="login">
+    <img class="logo" src="./img/logo.png" alt="SnapRemote">
+    <form action="javascript:void(0)" id="loginForm" class="login-form">
+        <h3>Create User</h3>
+        <input required id="username" class="login-input" type="text" placeholder="Username">
+        <input required id="password" class="login-input" type="password" placeholder="Password">
+        <input required id="password-repeat" class="login-input" type="password" placeholder="Password Repeat">
+        <button class="login-button">Create User</button>
+        <div class="error-message" id="error-message"></div>
+    </form>
+</div>
+<script>
+    const loginForm = document.getElementById('loginForm');
+
+    loginForm.addEventListener('submit', e => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const passwordRepeat = document.getElementById('password-repeat').value;
+
+        if (password !== passwordRepeat) {
+            document.getElementById('error-message').innerText = "Passwords do not match!";
+        } else if (password.length < 6) {
+            document.getElementById('error-message').innerText = "Password should be at least 6 characters!";
+        } else {
+            fetch("/createUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({username: username, password: password}),
+            }).then(response => response.json())
+                .then(json => {
+                    if (json.Status === 'OK')
+                        window.location.href = '/';
+                })
+                .catch(err => {
+                })
+        }
+    })
+</script>
+</body>
+</html>

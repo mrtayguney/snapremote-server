@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:x-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>SnapRemote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+<div class="menu" x-data="menu()">
+    <div class="menu-header">SnapRemote</div>
+    <div x-on:click="logout()" class="menu-item">Log Out</div>
+    <div x-on:click="disconnect()" class="menu-item">Disconnect From Server</div>
+</div>
+<section x-data="files()" :class="'left '+(open?'open':'closed')">
+    <h3>Files</h3>
+    <div class="collapse" x-on:click="toggleFiles()">
+        <img :src="open?'img/close-icon.png':'img/bars-icon.png'"/>
+    </div>
+    <div class="file-list">
+        <template x-for="item in list">
+            <div :id="'file'+item.id" class="file-item">
+                <div x-on:click="deleteFile(item.id)" class="file-delete">
+                    <img src="img/delete-icon.png"/>
+                </div>
+                <div class="file-image"><img :src="item.image"/></div>
+                <div class="file-info">
+                    <div class="file-name" x-text="item.name"></div>
+                    <div class="file-subinfo">
+                        <div class="file-subinfo-item">
+                            <div class="file-subinfo-item-icon"><img src="img/clock-icon.png"/></div>
+                            <div class="file-subinfo-item-text"
+                                 x-text="moment.utc(item.estimated_time*1000).format('HH[h] mm[m]').replace('00h ', '').replace('00m ', '')"></div>
+                        </div>
+                        <div class="file-subinfo-item">
+                            <div class="file-subinfo-item-icon"><img src="img/date-icon.png"/></div>
+                            <div class="file-subinfo-item-text"
+                                 x-text="moment.unix(item.upload_date).fromNow()"></div>
+                        </div>
+                    </div>
+                    <div class="file-button-area">
+                        <button x-on:click="printFile(item.id)">Print</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</section>
+<section :class="'center ' +machine_status" x-data="printInfo()">
+    <h3>Snapmaker</h3>
+    <div class="video-viewer" id="videoViewer">
+        <canvas class="video" id="videostream">
+        </canvas>
+        <template x-if="!$store.is_video_playing.on">
+            <div x-on:click="playVideo()" class="play-button">
+                <img src="img/video-play-icon.png"/>
+            </div>
+        </template>
+        <template x-if="$store.is_video_playing.on">
+            <div x-on:click="pauseVideo()" class="play-button pause">
+                <img src="img/video-pause-icon.png"/>
+            </div>
+        </template>
+    </div>
+    <div class="print-status ">
+        <div class="print-image">
+            <template x-if="image!=''">
+                <img :src="image"/>
+            </template>
+        </div>
+        <div class="print-info-container">
+            <div class="print-info">
+                <div class="print-info-name" x-text="file_name"></div>
+                <div class="print-info-time-left"
+                     x-text="machine_status!='idle'?time_remaining + ' left':'Machine is idle...'"></div>
+            </div>
+            <div class="print-info-buttons">
+                <button :class="machine_status=='paused' ? 'hide':''" x-on:click="pausePrint()"
+                        :disabled="machine_status!='running' && machine_status!='resuming'"
+                        style="border-color:#C1B258"><img
+                        src="img/pause-icon.png"/>
+                    <div style="color:#C1B258">Pause</div>
+                </button>
+                <button :class="machine_status!='paused' ? 'hide':''" x-on:click="resumePrint()"
+                        :disabled="machine_status!='running' && machine_status!='paused'" style="border-color:#66D202">
+                    <img
+                            src="img/play-icon.png"/>
+                    <div style="color:#66D202">Resume</div>
+                </button>
+                <button x-on:click="stopPrint()"
+                        :disabled="machine_status!='running' && machine_status!='paused' && machine_status!='resuming'"
+                        style="border-color:#C92F2F"><img
+                        src="img/stop-icon.png"/>
+                    <div style="color:#C92F2F">Stop</div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="progress-info">
+        <div class="progress-text" x-text="(machine_status!='idle'?progress:0) + '%'"></div>
+        <div class="line-info" x-text="current_layer+'/'+total_layer"></div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-bar-fill" :style="'width:'+(machine_status!='idle'?progress:0)+'%'"></div>
+    </div>
+    <div class="finish-time" x-text="'Finish Time: '+finish_time"></div>
+</section>
+<section class="right dark" x-data="printerMove()">
+    <div>
+        <div class="move-control">
+            <div class="overlay" ></div>
+            <h3>Move</h3>
+            <div class="xy-control" >
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y+')" class="move-button" style="top:0;left:80px;">
+                    <img src="img/move-button-background.png"/>
+                    <div style="margin-top:5px;">+Y</div>
+                </button>
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y-')" class="move-button" style="top:170px;left:80px;">
+                    <img style="transform: rotateZ(180deg)" src="img/move-button-background.png"/>
+                    <div style="margin-top:-5px;">-Y</div>
+                </button>
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x-')" class="move-button" style="top:85px;left:0px;">
+                    <img style="transform: rotateZ(-90deg)" src="img/move-button-background.png"/>
+                    <div style="margin-left:5px;">-X</div>
+                </button>
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x+')" class="move-button" style="top:85px;left:160px;">
+                    <img style="transform: rotateZ(90deg)" src="img/move-button-background.png"/>
+                    <div style="margin-left:-5px;">+X</div>
+                </button>
+                <div class="step-selector-container">
+                    <div class="selection"></div>
+                    <div id="xyStepScroll" class="step-selector">
+                        <template x-for="step in steps">
+                            <div x-on:click="changeStep('xy')" :data-value="step"
+                                 :class="'step '+ (xyStep==step?'active':'') " x-text="step+'mm'"></div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="z-control">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z+')" class="move-button" style="top:0;left:260px;">
+                    <img src="img/move-button-background.png"/>
+                    <div style="margin-top:5px;">+Z</div>
+                </button>
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z-')" class="move-button" style="top:170px;left:260px;">
+                    <img style="transform: rotateZ(180deg)" src="img/move-button-background.png"/>
+                    <div style="margin-top:-5px;">-Z</div>
+                </button>
+                <div class="step-selector-container" style="left: 260px;">
+                    <div class="selection"></div>
+                    <div id="zStepScroll" class="step-selector">
+                        <template x-for="step in steps">
+                            <div x-on:click="changeStep('z')" :data-value="step"
+                                 :class="'step '+ (zStep==step?'active':'') " x-text="step+'mm'"></div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="move-extra-buttons">
+            <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="home()" class="button">
+                <img src="img/home-icon.png"/>
+                <div class="button-text">Home</div>
+            </button>
+            <button :disabled="lock || $store.machine_status.status!='idle'" class="button">
+                <img src="img/target-icon.png"/>
+                <div class="button-text">Go Work Origin</div>
+            </button>
+            <button :disabled="lock || $store.machine_status.status!='idle'" class="button">
+                <img src="img/save-icon.png"/>
+                <div class="button-text">Set Origin</div>
+            </button>
+        </div>
+        <div class="seperator"></div>
+    </div>
+    <div>
+        <h3>Control</h3>
+        <div class="printer-control" x-data="printerControl()">
+            <img class="printer-image" src="img/3dp.png"/>
+            <div class="nozzle-control">
+                <div :class="'nozzle ' + (active_nozzle==0?'active':'')">
+                    <div class="nozzle-inner">
+                        <div class="nozzle-info">
+                            <div class="nozzle-name"><img src="img/nozzle-icon.png"/> LEFT</div>
+                            <div :class="'nozzle-status ' + (nozzle1_material_loaded?'loaded':'')"
+                                 x-text="nozzle1_material_loaded?'Loaded':'Empty'"></div>
+                        </div>
+                        <div :class="'temp ' + (nozzle1_target_temp>0?'heat':'')">
+                            <div class="current-temp" x-text="nozzle1_current_temp+'°'"></div>
+                            <div class="target-temp"> /
+                                <input x-mask="999" x-on:change.lazy="changeNozzleTemperature(0, $event)"
+                                       x-model.lazy="nozzle1_target_temp" x-on:focus="focus($event)"
+                                       value="1"/>°
+                            </div>
+                        </div>
+                    </div>
+                    <template x-if="active_nozzle==0">
+                        <div class="nozzle-buttons">
+                            <button x-on:click="loadFilament(0)" :disabled="!nozzle1_load_enabled" class="button">
+                                Load
+                            </button>
+                            <button x-on:click="unloadFilament(0)" :disabled="!nozzle1_load_enabled" class="button">
+                                Unload
+                            </button>
+                        </div>
+                    </template>
+                    <template x-if="active_nozzle!=0">
+                        <div class="nozzle-buttons">
+                            <button :disabled="!switch_enabled" x-on:click="changeNozzle(0)" class="button">
+                                Switch
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                <div :class="'nozzle ' + (active_nozzle==1?'active':'')">
+                    <div class="nozzle-inner">
+                        <div class="nozzle-info">
+                            <div class="nozzle-name"><img src="img/nozzle-icon.png"/>
+                                <div>RIGHT</div>
+                            </div>
+                            <div :class="'nozzle-status ' + (nozzle2_material_loaded?'loaded':'')"
+                                 x-text="nozzle2_material_loaded?'Loaded':'Empty'"></div>
+                        </div>
+                        <div :class="'temp ' + (nozzle2_target_temp>0?'heat':'')">
+                            <div class="current-temp" x-text="nozzle2_current_temp+'°'"></div>
+                            <div class="target-temp"> /
+                                <input x-mask="999" x-on:change.lazy="changeNozzleTemperature(1, $event)"
+                                       x-model.lazy="nozzle2_target_temp" x-on:focus="focus($event)"
+                                       value="1"/>°
+                            </div>
+                        </div>
+                    </div>
+                    <template x-if="active_nozzle==1">
+                        <div class="nozzle-buttons">
+                            <button x-on:click="loadFilament(1)" :disabled="!nozzle2_load_enabled" class="button">
+                                Load
+                            </button>
+                            <button x-on:click="unloadFilament(1)" :disabled="!nozzle2_load_enabled" class="button">
+                                Unload
+                            </button>
+                        </div>
+                    </template>
+                    <template x-if="active_nozzle!=1">
+                        <div class="nozzle-buttons">
+                            <button :disabled="!switch_enabled" x-on:click="changeNozzle(1)"  class="button">
+                                Switch
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+            </div>
+            <div class="control-item">
+                <img src="img/light-icon.png"/>
+                <div class="control-item-text">Enc. Light</div>
+                <label class="switch">
+                    <input type="checkbox" x-on:change="setEnclosureLight($event)" x-model="enclosure_light">
+                    <span class="knob"></span>
+                </label>
+            </div>
+            <div class="control-item">
+                <img src="img/fan-icon.png"/>
+                <div class="control-item-text">Enc. Fan</div>
+                <label class="switch">
+                    <input type="checkbox" x-on:change="setEnclosureFan($event)" x-model="enclosure_fan">
+                    <span class="knob"></span>
+                </label>
+            </div>
+            <div :class="'heatbed-control ' + (heatbed_outer_target_temp>0?'heat':'')">
+                <div class="outer-zone">
+                    <img src="img/heatbed-icon.png"/>
+                    <div class="heatbed-text">Heatbed</div>
+                    <div class="temp">
+                        <div class="current-temp light" x-text="heatbed_outer_current_temp+'°'"></div>
+                        <div class="target-temp light"> /
+                            <input x-mask="999" x-on:change.lazy="changeHeatbedTemperature(2, $event)"
+                                   x-model.lazy="heatbed_outer_target_temp" x-on:focus="focus($event)"/>°
+                        </div>
+                    </div>
+                </div>
+                <div :class="'inner-zone ' + (heatbed_inner_target_temp>0?'heat':'')">
+                    <div class="temp">
+                        <div class="current-temp light" x-text="heatbed_inner_current_temp+'°'"></div>
+                        <div class="target-temp light"> /
+                            <input x-mask="999" x-on:change.lazy="changeHeatbedTemperature(0, $event)"
+                                   x-model.lazy="heatbed_inner_target_temp" x-on:focus="focus($event)"/>°
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

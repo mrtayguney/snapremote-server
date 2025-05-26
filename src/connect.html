@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SnapRemote Connect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+    <script  src="js/utils.js"></script>
+
+</head>
+<body class="login-bodyw">
+<div class="login">
+    <img class="logo" src="./img/logo.png" alt="SnapRemote">
+    <form action="javascript:void(0)" id="connectForm" class="login-form">
+        <h3>Connect To Device</h3>
+        <p>The server is not connected to the device! Please connect it to use it.</p>
+        <button class="login-button">Connect</button>
+        <div class="error-message" id="error-message"></div>
+    </form>
+</div>
+<script>
+    const connectForm = document.getElementById('connectForm');
+
+    connectForm.addEventListener('submit', e => {
+
+        fetch("/connect", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "token": getCookie("token")
+            },
+            body: JSON.stringify({}),
+        }).then(response => response.json())
+            .then(json => {
+                if (json.Status === 'OK')
+                    window.location.href = '/';
+                else
+                    document.getElementById('error-message').innerText = "Connection Failed!";
+            })
+            .catch(err => {
+            })
+    })
+</script>
+</body>
+</html>
