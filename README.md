@@ -80,9 +80,16 @@ click connect. The server is going to connect to the Snapmaker device and you re
 > exported from the other slicers may not work correctly.
 
 ### Orca Slicer Configuration
-In OrcaSlicer you can connect the server like;
+In OrcaSlicer you click symbol next to your printer;
 
-![asdasd](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/img/bars-icon.png "Logo Title Text 1")
+![orca connection](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect.png "Logo Title Text 1")
+
+In the modal opened, Select 'Octo/Klipper' as Host Type and fill Hostname IP with your server address, like;
+>**http://[YOUR_SERVER_IP]:[YOUR_PORT]**
+
+Then you can click Test to test your connection. If it is ok, you can click OK button bellow to finish configuration.
+
+![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png "Logo Title Text 1")
 
 
 > ## BE AWARE
