@@ -3,4 +3,4 @@ database.json
 mainDb.json
 .idea/
 files/
-
+.env
