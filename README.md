@@ -33,8 +33,10 @@ sudo nano .env
 ### Sample .env file;
 
 ```
-JWT_SECRET_KEY=[YOUR_JWT_SECRET] //This key is for sign and verify your registered client to secure your connection with the server.
-PORT=[CLIENT_PORT] //This is your server's port.
+JWT_SECRET_KEY=[YOUR_JWT_SECRET] #This key is for sign and verify your registered client to secure your connection with the server.
+PORT=[CLIENT_PORT] #This is your server's port.
+DEVICE_IP=[SNAPMAKER_DEVICE_IP] #The ip address of the Snapmaker Device.
+DEVICE_PORT=8888 #Snapmaker Device's default TCP port. Don't change it!
 ```
 
 You can use https://jwtsecret.com/generate to generate yourself a JWT Secret and put it in your .env file.
@@ -57,6 +59,19 @@ applications alive forever, to reload them without downtime and to facilitate co
 More info and install instructions; https://github.com/Unitech/pm2
 
 ### Initial connection;
-Go to **http://[YOUR_SERVER_IP]:[YOUR_PORT]**
 
+If you got no error when running your server, go to **http://[YOUR_SERVER_IP]:[YOUR_PORT]** to create your user.
 
+> #### IMPORTANT NOTE
+> Only one user is supported right now.
+
+### Server Device Connection;
+
+The server is not going to connect the Snapmaker Device by itself. You see a screen titled 'Connect To Device' when the
+server is disconnected from the Snapmaker device. If no other device (ex. your Luban software or another server) is
+connected you can
+click connect. The server is going to connect to the Snapmaker device and you redirected to device control page.
+
+> ## BE AWARE
+> This server is based on Snapmaker SACP protocol. All of the functions implemented are tested in my device. If you have
+> modifications or any other changes there may be unexpected results. So use it with caution.
