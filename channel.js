@@ -4,6 +4,7 @@ import readline from "node:readline";
 import fs from "node:fs";
 import process from "node:process";
 import SacpClient from "./sacpClient.js";
+import sendNotificaiton from "./notificationManager.js";
 
 import {
     ExtruderInfo,
@@ -24,7 +25,6 @@ import {
     writeUint8,
 } from '@snapmaker/snapmaker-sacp-sdk/dist/helper.js';
 import {ModuleInfo} from "@snapmaker/snapmaker-sacp-sdk/dist/models/index.js";
-import sendNotificaiton from "./notificationManager.js";
 
 export const SINGLE_EXTRUDER_TOOLHEAD_FOR_ORIGINAL = 'singleExtruderToolheadForOriginal';
 export const SINGLE_EXTRUDER_TOOLHEAD_FOR_SM2 = 'singleExtruderToolheadForSM2';

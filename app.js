@@ -25,11 +25,6 @@ import {
     getGcodeProps
 } from './octoHelper.js';
 
-const serviceAccount = './snapmakerremote-firebase-adminsdk-fbsvc-07acbdd061.json';
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
 
 dotenv.config();
 
