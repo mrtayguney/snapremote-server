@@ -111,7 +111,7 @@ Download the file in an accessible folder in your computer and then in the OrcaS
 /usr/bin/python3 [path_to]/convert.py;
 ```
 
-![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post.png?raw=true "Logo Title Text 1")
+![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/post.png "Logo Title Text 1")
 ![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post2.png?raw=true "Logo Title Text 1")
 
 
