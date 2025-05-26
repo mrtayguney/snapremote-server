@@ -10,23 +10,22 @@ control device. You can run this server on a Raspberry PI which is in the same n
 
 
 ## SETUP
-Get the code to your server;
-
+### Get the code to your server;
 ```
 git clone https://github.com/mrtayguney/snapremote-server.git
 ```
 
-Install the packages;
+### Install the packages;
 ```
 cd snapremote-server
 npm install
 ```
-Create environment parameters;
+### Create environment parameters;
 ```
 touch .env
 sudo nano .env
 ```
-Sample .env file;
+### Sample .env file;
 ```
 JWT_SECRET_KEY=[YOUR_JWT_SECRET] //This key is for sign and verify your registered client to secure your connection with the server.
 PORT=[CLIENT_PORT] //This is your server's port.
