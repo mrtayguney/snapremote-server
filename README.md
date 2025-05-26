@@ -72,6 +72,19 @@ server is disconnected from the Snapmaker device. If no other device (ex. your L
 connected you can
 click connect. The server is going to connect to the Snapmaker device and you redirected to device control page.
 
+## UPLOADING FILES
+
+> #### IMPORTANT NOTE
+> Because the Snapmaker SACP protocol has missing some data the server fetch some data from the gcode files like print
+> progress, total layer lines and etc.. So all the system is optimized for using with the OrcaSlicer. The gcode files
+> exported from the other slicers may not work correctly.
+
+### Orca Slicer Configuration
+In OrcaSlicer you can connect the server like;
+
+![asdasd](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/img/bars-icon.png "Logo Title Text 1")
+
+
 > ## BE AWARE
 > This server is based on Snapmaker SACP protocol. All of the functions implemented are tested in my device. If you have
 > modifications or any other changes there may be unexpected results. So use it with caution.
