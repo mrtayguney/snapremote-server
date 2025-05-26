@@ -28,10 +28,9 @@ sudo nano .env
 ```
 Sample .env file;
 ```
-JWT_SECRET_KEY=[YOUR_JWT_SECRET]
-PORT=[CLIENT_PORT]
+JWT_SECRET_KEY=[YOUR_JWT_SECRET] //This key is for sign and verify your registered client to secure your connection with the server.
+PORT=[CLIENT_PORT] //This is your server's port.
 ```
-**JWT_SECRET_KEY:** This key is for sign and verify your registered client to secure your connection with the server.
-**PORT:** This is your server's port.
+
 
 
