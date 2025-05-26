@@ -31,6 +31,7 @@ Sample .env file;
 JWT_SECRET_KEY=[YOUR_JWT_SECRET] //This key is for sign and verify your registered client to secure your connection with the server.
 PORT=[CLIENT_PORT] //This is your server's port.
 ```
+You can use https://jwtsecret.com/generate to generate yourself a JWT Secret and put it in your .env file.
 
 
 
