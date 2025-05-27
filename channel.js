@@ -116,6 +116,49 @@ export const ENCLOSURE_MODULE_IDS = [
     518, // Enclosure for Ray
 ];
 
+const ERROR_REPORT_REASON = {
+    // Air Purifier module
+    '7-1': 'Air Purifier Disconnected. Please power off the machine, replug the Air Purifier, and restart. If the problem persists, contact our Support for help.',
+
+    // Emergency Stop
+    '8-1': 'Emergency Stop. Please make sure that there is no danger and restart the machine after releasing the emergency stop switch.',
+
+    // 20W laser module
+    '19-1': 'Abnormal Toolhead Orientation Detection. Please contact our Support for help.',
+    '19-2': 'Laser Emitter Overheat. Please power off the machine, wait for a while, and restart.If this occurs frequently, contact our Support for help.',
+    '19-3': 'Slanting Toolhead. Please reinstall the toolhead and make sure it does not slant in any direction. If this occurs frequently, contact our Support for help.',
+    '19-4': 'Abnormal Laser Emitter. Please contact our Support for help.',
+    '19-5': 'Abnormal Laser Heat Dissipation. Please contact our Support for help.',
+    '19-6': 'Flame detected. Please short press the button to resume work when it is safe to do so. The sensitivity of the flame detection can be modified in the machine settings.',
+    '19-9': 'Abnormal Laser Temperature Sensor. Please contact our Support for help.',
+    '19-10': 'Laser PCBA Overheat. Please power off the machine, wait for a while, and restart. If this occurs frequently, contact our Support for help.',
+    '19-12': 'Toolhead Disconnected. Please power off the machine, replug the toolhead, and restart. If the problem persists, contact our Support for help.',
+    '19-14': 'Laser Locked. Please unlock it on the controller.',
+
+    // 40W laser module
+    '20-1': 'Abnormal Toolhead Orientation Detection. Please contact our Support for help.',
+    '20-2': 'Laser Emitter Overheat. Please power off the machine, wait for a while, and restart.If this occurs frequently, contact our Support for help.',
+    '20-3': 'Slanting Toolhead. Please reinstall the toolhead and make sure it does not slant in any direction. If this occurs frequently, contact our Support for help.',
+    '20-4': 'Abnormal Laser Emitter. Please contact our Support for help.',
+    '20-5': 'Abnormal Laser Heat Dissipation. Please contact our Support for help.',
+    '20-6': 'Flame detected. Please short press the button to resume work when it is safe to do so. The sensitivity of the flame detection can be modified in the machine settings.',
+    '20-9': 'Abnormal Laser Temperature Sensor. Please contact our Support for help.',
+    '20-10': 'Laser PCBA Overheat. Please power off the machine, wait for a while, and restart. If this occurs frequently, contact our Support for help.',
+    '20-12': 'Toolhead Disconnected. Please power off the machine, replug the toolhead, and restart. If the problem persists, contact our Support for help.',
+    '20-14': 'Laser Locked. Please unlock it on the controller.',
+
+    // Linear Module
+    '516-7': 'Overstep the limit. X-axis limit switch triggered. Range of motion exceeds machine boundaries. If it occurs during machining, adjust the machine home position or confirm that the Gcode is correct.',
+    '516-8': 'Overstep the limit. Y-axis limit switch triggered. Range of motion exceeds machine boundaries. If it occurs during machining, adjust the machine home position or confirm that the Gcode is correct.',
+
+    // Snapmaker Ray - Enclosure
+    '518-2': 'The Enclosure door is opened or Enclosure disconnected. Please close the door or power off the machine, replug the Enclosure.If there is no Enclosure, please turn off door detection in the machine setting.',
+
+    // Snapmaker Ray - Controller
+    '2051-1': 'Toolhead not detected. Please power off the machine, plug the toolhead into the controller, and restart. If the problem persists, contact our Support for help.',
+    '2051-5': 'Failed to Home.Please check if any Linear Module is prevented from moving.If the problem persists, contact our Support for help.',
+};
+
 const WORKFLOW_STATUS_MAP = {
     '0': 'idle',
     '1': 'starting',
@@ -629,6 +672,9 @@ export default class Channel extends BaseChannel {
                     const result = readString(data.response.data, 1).result;
                     if (result === null) {
                     }
+                    console.log(result)
+                    if(result.includes('print finish'))
+                        sendNotificaiton("Job Finished", "Your job is finished.", {})
 
                    io.sockets.emit('serialport:read', { data: result });
                 };
@@ -662,6 +708,11 @@ export default class Channel extends BaseChannel {
             const level = readUint8(param, 0);
             const owner = readUint16(param, 1);
             const errorCode = readUint8(param, 3);
+            if(errorCode===12 && owner===13)
+                sendNotificaiton("Error", "The extruder is continuously pulled up and printing is paused.", {})
+            if(errorCode===11 && owner===13)
+                sendNotificaiton("Error", "Filament run out detected and printing is paused.", {})
+
             io.sockets.emit("deviceError", { level, owner, errorCode });
         });
     }
