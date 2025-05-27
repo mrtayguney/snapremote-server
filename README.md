@@ -1,6 +1,6 @@
 # SnapRemote
 
-## 🛠️ Abo the Project Yeah
+## 🛠️ About the Project
 
 **SnapRemote** is a Node.js server that creates an interface to connect Snapmaker devices. It also serves a web client to control your device remotely. You can run this server on a Raspberry Pi within the same local network as your Snapmaker.
 
