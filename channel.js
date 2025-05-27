@@ -437,7 +437,7 @@ export default class Channel extends BaseChannel {
                                 try {
                                     let {files} = db.data;
                                     let foundItem = files.find((item) => item.name === fileInfo.gcodeName);
-                                    this.sacpClient.getPrintingFileInfo();
+                                    //this.sacpClient.getPrintingFileInfo();
 
                                     if(foundItem) {
                                         let progress = foundItem["progress_layers"][0].progress;
@@ -482,7 +482,7 @@ export default class Channel extends BaseChannel {
                                             "timeRemaining": 0,
                                             "currentLayer": 0,
                                             "totalLayer": 0,
-                                            "machineStatus": this.machineStatus,
+                                            "machineStatus": this.machineStatus ? this.machineStatus : "idle",
                                             "fileName": fileInfo.gcodeName,
                                             "image": ""
                                         }
