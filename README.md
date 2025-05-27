@@ -132,8 +132,8 @@ Go to `Preset Settings > Others > Post-processing Scripts`, and add:
 C:\Program Files\Python39\python.exe D:\path\to\convert.py
 ```
 
-![orca post config](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/post.png)
-![orca post config 2](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/post2.png)
+![orca post config](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post.png?raw=true)
+![orca post config 2](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post2.png?raw=true)
 
 ---
 
