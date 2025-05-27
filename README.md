@@ -44,6 +44,16 @@ WEBCAM_PATH="/dev/video0"     # If you have webcam connected to your server, you
 
 Generate a secret at: [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
 
+You can get your webcam path with the code;
+```bash
+sudo apt install v4l-utils
+v4l2-ctl --list-devices
+Sample output;
+```
+```
+HD Pro Webcam C920 (usb-3f980000.usb-1.1.2):
+	/dev/video0
+```
 ### 4. Run Your Server
 
 ```bash
