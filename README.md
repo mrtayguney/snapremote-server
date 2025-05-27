@@ -1,129 +1,145 @@
-# About The Project
+# SnapRemote
 
-SnapRemote is a node.js server that create an interface to connect Snapmaker devices. It also serves a web client to
-control device. You can run this server on a Raspberry PI which is in the same network with the Snapmaker device.
+## 🛠️ About the Project
 
+**SnapRemote** is a Node.js server that creates an interface to connect Snapmaker devices. It also serves a web client to control your device remotely. You can run this server on a Raspberry Pi within the same local network as your Snapmaker.
 
-> ## IMPORTANT NOTE
-> It only works with Snapmaker Artisan right now. Only the 3D Printing Functions are tested. Other functions will be
-> developed. So don't use this server to control Laser or CNC functions.
+> ## ⚠️ IMPORTANT NOTE
+> SnapRemote currently supports only **Snapmaker Artisan** and only **3D Printing** functionality has been tested.  
+> **Laser** and **CNC** features are not yet supported. Do not use this server for Laser or CNC operations.
 
-## SETUP
+---
 
-### Get the code to your server;
+## ⚙️ Setup
 
-```
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/mrtayguney/snapremote-server.git
-```
-
-### Install the packages;
-
-```
 cd snapremote-server
+```
+
+### 2. Install the Packages
+
+```bash
 npm install
 ```
 
-### Create environment parameters;
+### 3. Create Environment Variables
 
-```
+```bash
 touch .env
 sudo nano .env
 ```
 
-### Sample .env file;
+#### Sample `.env` file
 
+```env
+JWT_SECRET_KEY=[YOUR_JWT_SECRET]   # For verifying registered clients
+PORT=[CLIENT_PORT]                 # Port the server runs on
+DEVICE_IP=[SNAPMAKER_DEVICE_IP]    # IP address of your Snapmaker
+DEVICE_PORT=8888                   # Default Snapmaker TCP port (do not change)
 ```
-JWT_SECRET_KEY=[YOUR_JWT_SECRET] #This key is for sign and verify your registered client to secure your connection with the server.
-PORT=[CLIENT_PORT] #This is your server's port.
-DEVICE_IP=[SNAPMAKER_DEVICE_IP] #The ip address of the Snapmaker Device.
-DEVICE_PORT=8888 #Snapmaker Device's default TCP port. Don't change it!
-```
 
-You can use https://jwtsecret.com/generate to generate yourself a JWT Secret and put it in your .env file.
+Generate a secret at: [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
 
-### Run your server;
+---
 
-```
+### 4. Run Your Server
+
+```bash
 node app.js
 ```
 
-or
+or with PM2:
 
-```
+```bash
 pm2 start app.js
 ```
 
-PM2 is a production process manager for Node.js/Bun applications with a built-in load balancer. It allows you to keep
-applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
+> PM2 is a production process manager for Node.js/Bun apps. It keeps your apps running and simplifies deployment.  
+> [Learn more about PM2](https://github.com/Unitech/pm2)
 
-More info and install instructions; https://github.com/Unitech/pm2
+---
 
-### Initial connection;
+### Initial Connection
 
-If you got no error when running your server, go to **http://[YOUR_SERVER_IP]:[YOUR_PORT]** to create your user.
-
-> #### IMPORTANT NOTE
-> Only one user is supported right now.
-
-### Server Device Connection;
-
-The server is not going to connect the Snapmaker Device by itself. You see a screen titled 'Connect To Device' when the
-server is disconnected from the Snapmaker device. If no other device (ex. your Luban software or another server) is
-connected you can
-click connect. The server is going to connect to the Snapmaker device and you redirected to device control page.
-
-## UPLOADING FILES
-
-> #### IMPORTANT NOTE
-> Because the Snapmaker SACP protocol has missing some data the server fetch some data from the gcode files like print
-> progress, total layer lines and etc.. So all the system is optimized for using with the OrcaSlicer. The gcode files
-> exported from the other slicers may not work correctly.
-
-### OrcaSlicer Configuration
-
-In OrcaSlicer you click symbol next to your printer;
-
-![orca connection](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect.png "Logo Title Text 1")
-
-In the modal opened, Select 'Octo/Klipper' as Host Type and fill Hostname IP with your server address, like;
+Once your server starts without errors, visit:
 
 ```
 http://[YOUR_SERVER_IP]:[YOUR_PORT]
 ```
 
-Then you can click Test to test your connection. If it is ok, you can click OK button bellow to finish configuration.
+Follow the prompts to create your user account.
 
-![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png "Logo Title Text 1")
+> ⚠️ Only one user is supported at the moment.
 
-### OrcaSlicer Post Process
+---
 
-To create gcode files that you can use in the Snapmaker device's screen and include all the information that can
-readable by your device, you need to add some print related data to your gcode file. For this I created a post process
-script to do that in OrcaSlicer every time you create a gcode file.
+### Server Device Connection
 
-> **The post process file;**
-> 
-> https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/post_process/convert.py
+The server will **not** auto-connect to your Snapmaker. If the connection is not established, the UI will show a "Connect To Device" page.
 
-Download the file in an accessible folder in your computer and then in the OrcaSlicer go to Others tab in your preset settings. Locate the Post-processing Scripts at the bottom. Write down the code bellow;
+Ensure no other app (e.g. Luban) is using the Snapmaker, then click **Connect** to proceed to the control panel.
 
-**For MAC;**
+---
+
+## 📁 Uploading Files
+
+> ⚠️ IMPORTANT NOTE  
+> The Snapmaker SACP protocol is missing some metadata (e.g., progress, layer lines).  
+> The server extracts this from G-code files. For best results, use **OrcaSlicer**.  
+> G-codes from other slicers may not function correctly.
+
+
+
+## 🧩 OrcaSlicer Configuration
+
+Click the gear icon next to your printer in OrcaSlicer:
+
+![orca connection](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect.png)
+
+In the modal, choose:
+
+- **Host Type**: Octo/Klipper
+- **Hostname/IP**: `http://[YOUR_SERVER_IP]:[YOUR_PORT]`
+
+Then click **Test**, and if successful, click **OK**.
+
+![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png)
+
+---
+
+## 🧪 OrcaSlicer Post-Processing Script
+
+To include full print data (e.g., layer count) in your G-code:
+
+### Download Script
+
+[convert.py](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/post_process/convert.py)
+
+### Configure in OrcaSlicer
+
+Go to `Preset Settings > Others > Post-processing Scripts` and add:
+
+#### macOS
+
+```bash
+/path/to/python3 /path/to/convert.py
 ```
-/path/to/python3 /path/to/convert.py;
+
+#### Windows
+
+```bash
+C:\Program Files\Python39\python.exe D:\path\to\convert.py
 ```
 
-**For Windows;**
-```
-C:\Program Files\Python39\python.exe” D:\path\to\convert.py
-```
+![orca post config](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post.png?raw=true)
+![orca post config 2](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post2.png?raw=true)
 
-![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post.png?raw=true "Logo Title Text 1")
-![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/post2.png?raw=true "Logo Title Text 1")
+---
 
+## ⚠️ Be Aware
 
-
-
-
-> ## BE AWARE
-> This server is based on Snapmaker SACP protocol. All of the functions implemented are tested in my device. If you have
-> modifications or any other changes there may be unexpected results. So use it with caution.
+This server is based on the Snapmaker SACP protocol. All functionality has been tested on my device.  
+If your device or firmware differs, unexpected results may occur. Use with caution.
