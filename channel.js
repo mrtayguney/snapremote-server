@@ -203,7 +203,7 @@ export default class Channel extends BaseChannel {
             }, async () => {
                 this.sacpClient = new SacpClient('tcp', this.client);
                 try {
-                    const {response} = await this.sacpClient.wifiConnection("Deneme", 'Murat', "asdasd", () => {
+                    const {response} = await this.sacpClient.wifiConnection("SnapRemoteServer", 'SnapRemote', "", () => {
                         // disconnected
                         this.client.destroy();
                     });
