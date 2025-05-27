@@ -13,14 +13,14 @@ try:
 
         thumbnail = ""
         do_write = False
-        filament_use_gr = 0
-        filament_use_m = 0
-        layer_number = 0
-        layer_height = 0
+        filament_use_gr = None
+        filament_use_m = None
+        layer_number = None
+        layer_height = None
         nozzle_0_material = ""
         nozzle_1_material = ""
-        nozzle_0_diameter = 0.0
-        nozzle_1_diameter = 0.0
+        nozzle_0_diameter = None
+        nozzle_1_diameter = None
 
         for i, line in enumerate(lines):
             if "; thumbnail end" in line:
@@ -37,8 +37,8 @@ try:
                 filament_use_m = float(line.split("=")[1].strip().split(",")[0]) / 1000
             elif "; filament used [mm]" in line:
                 filament_use_m = float(line.split("=")[1].strip().split(",")[0]) / 1000
-            elif "; total_layer_number" in line and layer_number == 0:
-                layer_number = int(line.split("=")[1].strip().split(",")[0])
+            elif "; total_layer_number" in line and layer_number == None:
+                layer_number = int(line.split("=")[1].strip())
             elif "; layer_height" in line:
                 layer_height = float(line.split("=")[1].strip().split(",")[0])
             elif "; filament_settings_id" in line:

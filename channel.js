@@ -170,6 +170,10 @@ export default class Channel extends BaseChannel {
                 const gcodeFileInfo = new GcodeFileInfo().fromBuffer(buffer.slice(13, buffer.length));
                 gcodeFileInfo["machineStatus"] = this.machineStatus;
                 this.currentGcodeFileInfo = gcodeFileInfo;
+            }else if(buffer[11] === 0xac && buffer[12] === 0x1a) {
+                const { nextOffset, result } = readString(buffer.slice(13, buffer.length));
+                console.log(result);
+                //console.log(buffer.slice(13, buffer.length));
             }
         });
         this.client.on('close', () => {
@@ -219,6 +223,14 @@ export default class Channel extends BaseChannel {
     }
 
     async connectionClose() {
+        // to-do check unsubscription
+        // this.sacpClient.unsubscribeNozzleInfo()
+        // this.sacpClient.unsubscribeHeatbedInfo()
+        // this.sacpClient.unsubscribeEnclosureInfo();
+        this.nozzleInfoSubscribed = false;
+        this.heatbedInfoSubscribed = false;
+        this.enclosureInfoSubscribed = false;
+        this.printLineSubscribed = false;
         return this.sacpClient.wifiConnectionClose();
     }
 
@@ -405,6 +417,8 @@ export default class Channel extends BaseChannel {
         return response;
     }
 
+
+
     async subscribeGetPrintCurrentLineNumber(db, io) {
         return new Promise((resolve, reject) => {
             if (this.printLineSubscribed) {
@@ -412,7 +426,7 @@ export default class Channel extends BaseChannel {
             } else {
                 //todo veribanı kontrolleri yapılacak var mı yok mu bakalım
                 this.sacpClient.subscribeGetPrintCurrentLineNumber(
-                    {interval: 10000},
+                    {interval: 5000},
                     ({response}) => {
                         this.getFileInfo().then((fileInfo) => {
                             if (fileInfo && this.machineStatus !== 'idle') {
@@ -423,40 +437,59 @@ export default class Channel extends BaseChannel {
                                 try {
                                     let {files} = db.data;
                                     let foundItem = files.find((item) => item.name === fileInfo.gcodeName);
-                                    let progress = foundItem["progress_layers"][0].progress;
-                                    let timeRemaining = foundItem["progress_layers"][0].timeRemaining;
-                                    let currentLayer = 1;
+                                    this.sacpClient.getPrintingFileInfo();
 
-                                    for (let i = 1; i < foundItem["progress_layers"].length; i++) {
-                                        let layer = foundItem["progress_layers"][i];
-                                        if (layer.line < printLine) {
-                                            progress = layer.progress;
-                                            timeRemaining = layer.timeRemaining;
-                                        } else {
-                                            break;
+                                    if(foundItem) {
+                                        let progress = foundItem["progress_layers"][0].progress;
+                                        let timeRemaining = foundItem["progress_layers"][0].timeRemaining;
+                                        let currentLayer = 1;
+
+                                        for (let i = 1; i < foundItem["progress_layers"].length; i++) {
+                                            let layer = foundItem["progress_layers"][i];
+                                            if (layer.line < printLine) {
+                                                progress = layer.progress;
+                                                timeRemaining = layer.timeRemaining;
+                                            } else {
+                                                break;
+                                            }
                                         }
-                                    }
 
-                                    for (let i = 1; i < foundItem["layer_changes"].length; i++) {
-                                        let layer = foundItem["layer_changes"][i];
-                                        if (layer.line < printLine) {
-                                            currentLayer = layer.currentLayer;
-                                        } else {
-                                            break;
+                                        for (let i = 1; i < foundItem["layer_changes"].length; i++) {
+                                            let layer = foundItem["layer_changes"][i];
+                                            if (layer.line < printLine) {
+                                                currentLayer = layer.currentLayer;
+                                            } else {
+                                                break;
+                                            }
                                         }
+
+                                        this.printProgress = {
+                                            "progress": progress,
+                                            "timeRemaining": timeRemaining,
+                                            "currentLayer": currentLayer,
+                                            "totalLayer": foundItem.layer_number,
+                                            "machineStatus": this.machineStatus ? this.machineStatus : "idle",
+                                            "fileName": fileInfo.gcodeName,
+                                            "image": foundItem.image
+                                        }
+                                        io.sockets.emit('printInfo', this.printProgress);
+                                        resolve(this.printProgress);
+                                    }
+                                    else{
+                                        this.printLineSubscribed = true;
+                                        this.printProgress = {
+                                            "progress": 0,
+                                            "timeRemaining": 0,
+                                            "currentLayer": 0,
+                                            "totalLayer": 0,
+                                            "machineStatus": this.machineStatus,
+                                            "fileName": fileInfo.gcodeName,
+                                            "image": ""
+                                        }
+                                        io.sockets.emit('printInfo', this.printProgress);
+                                        resolve(this.printProgress);
                                     }
 
-                                    this.printProgress = {
-                                        "progress": progress,
-                                        "timeRemaining": timeRemaining,
-                                        "currentLayer": currentLayer,
-                                        "totalLayer": foundItem.layer_number,
-                                        "machineStatus": this.machineStatus ? this.machineStatus : "idle",
-                                        "fileName": fileInfo.gcodeName,
-                                        "image": foundItem.image
-                                    }
-                                    io.sockets.emit('printInfo', this.printProgress);
-                                    resolve(this.printProgress);
                                 } catch (e) {
                                     reject(e);
                                 }

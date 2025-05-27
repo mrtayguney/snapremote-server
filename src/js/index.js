@@ -51,7 +51,7 @@ function printInfo() {
         machine_status: "idle",
         file_name: "",
         image: "",
-        finish_time: 0,
+        finish_time: "",
         init() {
             this.$watch("machine_status", value => Alpine.store('machine_status').set(value));
             this.fetchData();
@@ -61,9 +61,17 @@ function printInfo() {
                 //console.log(error);
             });
 
-            socket.on('serialport:read', (error) => {
-                //console.log("port");
-                //console.log(error);
+            socket.on('serialport:read', (log) => {
+                // if (log.data.includes("M73")) {
+                //     this.progress = log.data.split("M73")[1].trim().split(" ")[0].replace("P", "");
+                //     let timeRemaining = log.data.split("M73")[1].trim().split(" ")[1].replace("R", "");
+                //     this.time_remaining = moment.utc(timeRemaining * 60 * 1000).format('HH [hours] mm [minutes] ss [seconds]').replace('00 hours ', '').replace('00 minutes ', '').replace('00 seconds', '')
+                //     let finishDateTime = moment.utc().add(timeRemaining * 60 * 1000)
+                //     if (finishDateTime.diff(moment.utc(), 'days') > 0)
+                //         this.finish_time = finishDateTime.local().format("dddd DD MMM, HH:mm");
+                //     else
+                //         this.finish_time = finishDateTime.local().format("HH:mm");
+                // }
             });
 
             socket.on('connection:stopGcode', (error) => {
@@ -88,19 +96,20 @@ function printInfo() {
                     if (json.Status === "OK") {
                         let callback = (data) => {
                             let jsonInfo = data;
+                            this.machine_status = jsonInfo.machineStatus;
+                            this.file_name = jsonInfo.fileName;
                             this.time_remaining = moment.utc(jsonInfo.timeRemaining * 60 * 1000).format('HH [hours] mm [minutes] ss [seconds]').replace('00 hours ', '').replace('00 minutes ', '').replace('00 seconds', '');
                             this.progress = jsonInfo.progress;
                             this.current_layer = jsonInfo.currentLayer;
                             this.total_layer = jsonInfo.totalLayer;
-                            this.machine_status = jsonInfo.machineStatus;
-                            this.file_name = jsonInfo.fileName;
                             this.image = jsonInfo.image;
-
-                            let finishDateTime=moment.utc().add(jsonInfo.timeRemaining * 60 * 1000)
-                            if(finishDateTime.diff(moment.utc(), 'days')>0)
-                                this.finish_time = finishDateTime.local().format("dddd DD MMM, HH:mm");
-                            else
-                                this.finish_time = finishDateTime.local().format("HH:mm");
+                            if (jsonInfo.time_remaining > 0) {
+                                let finishDateTime = moment.utc().add(jsonInfo.timeRemaining * 60 * 1000)
+                                if (finishDateTime.diff(moment.utc(), 'days') > 0)
+                                    this.finish_time = finishDateTime.local().format("dddd DD MMM, HH:mm");
+                                else
+                                    this.finish_time = finishDateTime.local().format("HH:mm");
+                            }
 
                         }
                         callback(JSON.parse(json.Response));
@@ -268,6 +277,7 @@ function printerControl() {
             })
                 .then(response => response.json())
                 .then(json => {
+
                     if (json.Status === "OK") {
                         this.nozzle_info_loaded = true;
                         this.setNozzleInfo(JSON.parse(json.Response));

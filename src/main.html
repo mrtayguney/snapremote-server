@@ -82,7 +82,7 @@
             <div class="print-info">
                 <div class="print-info-name" x-text="file_name"></div>
                 <div class="print-info-time-left"
-                     x-text="machine_status!='idle'?time_remaining + ' left':'Machine is idle...'"></div>
+                     x-text="machine_status!='idle' ? (time_remaining!=''?time_remaining+ ' left':'Printing') :'Machine is idle...'"></div>
             </div>
             <div class="print-info-buttons">
                 <button :class="machine_status=='paused' ? 'hide':''" x-on:click="pausePrint()"
@@ -106,34 +106,44 @@
             </div>
         </div>
     </div>
-    <div class="progress-info">
-        <div class="progress-text" x-text="(machine_status!='idle'?progress:0) + '%'"></div>
-        <div class="line-info" x-text="current_layer+'/'+total_layer"></div>
-    </div>
-    <div class="progress-bar">
-        <div class="progress-bar-fill" :style="'width:'+(machine_status!='idle'?progress:0)+'%'"></div>
-    </div>
-    <div class="finish-time" x-text="'Finish Time: '+finish_time"></div>
+    <template x-if="machine_status=='running' && time_remaining!=''">
+        <div class="progress-info">
+            <div class="progress-text" x-text="(machine_status!='idle'?progress:0) + '%'"></div>
+            <div class="line-info" x-show="total_layer>0" x-text="current_layer+'/'+total_layer"></div>
+        </div>
+    </template>
+    <template x-if="machine_status=='running' && time_remaining!=''">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" :style="'width:'+(machine_status!='idle'?progress:0)+'%'"></div>
+        </div>
+    </template>
+    <template x-if="machine_status=='running'">
+        <div class="finish-time" x-show="finish_time!==''" x-text="'Finish Time: '+finish_time"></div>
+    </template>
 </section>
 <section class="right dark" x-data="printerMove()">
     <div>
         <div class="move-control">
-            <div class="overlay" ></div>
+            <div class="overlay"></div>
             <h3>Move</h3>
-            <div class="xy-control" >
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y+')" class="move-button" style="top:0;left:80px;">
+            <div class="xy-control">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y+')"
+                        class="move-button" style="top:0;left:80px;">
                     <img src="img/move-button-background.png"/>
                     <div style="margin-top:5px;">+Y</div>
                 </button>
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y-')" class="move-button" style="top:170px;left:80px;">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('y-')"
+                        class="move-button" style="top:170px;left:80px;">
                     <img style="transform: rotateZ(180deg)" src="img/move-button-background.png"/>
                     <div style="margin-top:-5px;">-Y</div>
                 </button>
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x-')" class="move-button" style="top:85px;left:0px;">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x-')"
+                        class="move-button" style="top:85px;left:0px;">
                     <img style="transform: rotateZ(-90deg)" src="img/move-button-background.png"/>
                     <div style="margin-left:5px;">-X</div>
                 </button>
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x+')" class="move-button" style="top:85px;left:160px;">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('x+')"
+                        class="move-button" style="top:85px;left:160px;">
                     <img style="transform: rotateZ(90deg)" src="img/move-button-background.png"/>
                     <div style="margin-left:-5px;">+X</div>
                 </button>
@@ -148,11 +158,13 @@
                 </div>
             </div>
             <div class="z-control">
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z+')" class="move-button" style="top:0;left:260px;">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z+')"
+                        class="move-button" style="top:0;left:260px;">
                     <img src="img/move-button-background.png"/>
                     <div style="margin-top:5px;">+Z</div>
                 </button>
-                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z-')" class="move-button" style="top:170px;left:260px;">
+                <button :disabled="lock || $store.machine_status.status!='idle'" x-on:click="move('z-')"
+                        class="move-button" style="top:170px;left:260px;">
                     <img style="transform: rotateZ(180deg)" src="img/move-button-background.png"/>
                     <div style="margin-top:-5px;">-Z</div>
                 </button>
@@ -253,7 +265,7 @@
                     </template>
                     <template x-if="active_nozzle!=1">
                         <div class="nozzle-buttons">
-                            <button :disabled="!switch_enabled" x-on:click="changeNozzle(1)"  class="button">
+                            <button :disabled="!switch_enabled" x-on:click="changeNozzle(1)" class="button">
                                 Switch
                             </button>
                         </div>
