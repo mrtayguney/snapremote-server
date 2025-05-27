@@ -95,7 +95,7 @@ Ensure no other app (e.g., Luban) is using the Snapmaker, then click **Connect**
 
 Click the gear icon next to your printer in OrcaSlicer:
 
-![orca connection](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect.png)
+![orca connection](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/orca-connect.png?raw=true)
 
 In the modal, choose:
 
@@ -104,7 +104,7 @@ In the modal, choose:
 
 Then click **Test**, and if successful, click **OK**.
 
-![orca connection configuration](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/src/readme/orca-connect2.png)
+![orca connection configuration](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/orca-connect2.png?raw=true)
 
 ---
 
