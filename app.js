@@ -43,36 +43,40 @@ const db = await JSONFilePreset('database.json', defaultData)
 const mainDb = await JSONFilePreset('mainDb.json', {})
 
 const PORT = process.env.PORT || 3000;
+const WEBCAM_PATH = process.env.WEBCAM_PATH;
 
 var ffmpeg = null;
 
 function ffmpegCommand() {
-    ffmpeg = child_process.spawn("ffmpeg", [
-        "-i", "/dev/video0",
-        "-s", "854x480",
-        "-preset", "ultrafast",
-        '-acodec', 'copy',
-        "-f", "mjpeg",
-        "-r", "15",
-        "-vb", "5M",
-        "pipe:1"]);
+    if(WEBCAM_PATH) {
 
-    ffmpeg.on('error', function (err) {
-        throw err;
-    });
+        ffmpeg = child_process.spawn("ffmpeg", [
+            "-i", WEBCAM_PATH,
+            "-s", "854x480",
+            "-preset", "ultrafast",
+            '-acodec', 'copy',
+            "-f", "mjpeg",
+            "-r", "15",
+            "-vb", "5M",
+            "pipe:1"]);
 
-    ffmpeg.on('close', function (code) {
-        console.log('ffmpeg exited with code ' + code);
-    });
+        ffmpeg.on('error', function (err) {
+            throw err;
+        });
 
-    ffmpeg.stderr.on('data', function (data) {
-        // console.log('stderr: ' + data);
-    });
+        ffmpeg.on('close', function (code) {
+            console.log('ffmpeg exited with code ' + code);
+        });
 
-    ffmpeg.stdout.on('data', function (data) {
-        var frame = new Buffer(data).toString('base64');
-        io.sockets.emit('canvas', frame);
-    });
+        ffmpeg.stderr.on('data', function (data) {
+            // console.log('stderr: ' + data);
+        });
+
+        ffmpeg.stdout.on('data', function (data) {
+            var frame = new Buffer(data).toString('base64');
+            io.sockets.emit('canvas', frame);
+        });
+    }
 }
 
 app.use(express.json());
