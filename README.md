@@ -5,8 +5,8 @@
 **SnapRemote** is a Node.js server that creates an interface to connect Snapmaker devices. It also serves a web client to control your device remotely. You can run this server on a Raspberry Pi within the same local network as your Snapmaker.
 
 > ## ⚠️ IMPORTANT NOTE
-> SnapRemote currently supports only **Snapmaker Artisan** and only **3D Printing** functionality has been tested.  
-> **Laser** and **CNC** features are not yet supported. Do not use this server for Laser or CNC operations.
+> SnapRemote currently supports only the **Snapmaker Artisan**, and only the **3D Printing** functionality has been tested.  
+> **Laser** and **CNC** features are not yet supported. Do not use this server for laser or CNC operations.
 
 ---
 
@@ -55,7 +55,7 @@ or with PM2:
 pm2 start app.js
 ```
 
-> PM2 is a production process manager for Node.js/Bun apps. It keeps your apps running and simplifies deployment.  
+> PM2 is a production process manager for Node.js apps. It keeps your apps running and simplifies deployment.  
 > [Learn more about PM2](https://github.com/Unitech/pm2)
 
 ---
@@ -70,7 +70,7 @@ http://[YOUR_SERVER_IP]:[YOUR_PORT]
 
 Follow the prompts to create your user account.
 
-> ⚠️ Only one user is supported at the moment.
+> ⚠️ Only a single user is supported at the moment.
 
 ---
 
@@ -78,7 +78,7 @@ Follow the prompts to create your user account.
 
 The server will **not** auto-connect to your Snapmaker. If the connection is not established, the UI will show a "Connect To Device" page.
 
-Ensure no other app (e.g. Luban) is using the Snapmaker, then click **Connect** to proceed to the control panel.
+Ensure no other app (e.g., Luban) is using the Snapmaker, then click **Connect** to proceed to the control panel.
 
 ---
 
@@ -87,7 +87,7 @@ Ensure no other app (e.g. Luban) is using the Snapmaker, then click **Connect** 
 > ⚠️ IMPORTANT NOTE  
 > The Snapmaker SACP protocol is missing some metadata (e.g., progress, layer lines).  
 > The server extracts this from G-code files. For best results, use **OrcaSlicer**.  
-> G-codes from other slicers may not function correctly.
+> G-code files from other slicers may not function correctly.
 
 
 
@@ -118,7 +118,7 @@ To include full print data (e.g., layer count) in your G-code:
 
 ### Configure in OrcaSlicer
 
-Go to `Preset Settings > Others > Post-processing Scripts` and add:
+Go to `Preset Settings > Others > Post-processing Scripts`, and add:
 
 #### macOS
 
@@ -138,5 +138,5 @@ C:\Program Files\Python39\python.exe D:\path\to\convert.py
 ---
 
 >## ⚠️ Be Aware
->This server is based on the Snapmaker SACP protocol. All functionality has been tested on my device.  
+>This server is built using the Snapmaker SACP protocol. All functionality has been tested on my device.  
 >If your device or firmware differs, unexpected results may occur. Use with caution.
