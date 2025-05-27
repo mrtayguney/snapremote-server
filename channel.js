@@ -672,7 +672,7 @@ export default class Channel extends BaseChannel {
                     const result = readString(data.response.data, 1).result;
                     if (result === null) {
                     }
-                    console.log(result)
+                    //console.log(result)
                     if(result.includes('print finish'))
                         sendNotificaiton("Job Finished", "Your job is finished.", {})
 
