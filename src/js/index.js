@@ -43,7 +43,7 @@ function menu() {
 
 function printInfo() {
     return {
-        time_remaining: 0,
+        time_remaining: '',
         progress: 0,
         current_layer: 0,
         total_layer: 0,
