@@ -43,8 +43,6 @@ DEVICE_PORT=8888                   # Default Snapmaker TCP port (do not change)
 
 Generate a secret at: [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
 
----
-
 ### 4. Run Your Server
 
 ```bash
