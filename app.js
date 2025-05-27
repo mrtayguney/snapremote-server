@@ -534,6 +534,15 @@ app.post("/api/files/local", upload.single('file'), async (request, response) =>
         // Create payload object
         const payload = newPayload(file.buffer, file.originalname, file.size);
 
+        const folderName = './files';
+        try {
+            if (!fs.existsSync(folderName)) {
+                fs.mkdirSync(folderName);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+
         fs.writeFile('./files/' + file.originalname, file.buffer, async (err) => {
             if (err) {
                 console.error(err);
