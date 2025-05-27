@@ -48,8 +48,8 @@ You can get your webcam path with the code;
 ```bash
 sudo apt install v4l-utils
 v4l2-ctl --list-devices
-Sample output;
 ```
+Sample output;
 ```
 HD Pro Webcam C920 (usb-3f980000.usb-1.1.2):
 	/dev/video0
