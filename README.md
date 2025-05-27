@@ -39,6 +39,7 @@ JWT_SECRET_KEY=[YOUR_JWT_SECRET]   # For verifying registered clients
 PORT=[CLIENT_PORT]                 # Port the server runs on
 DEVICE_IP=[SNAPMAKER_DEVICE_IP]    # IP address of your Snapmaker
 DEVICE_PORT=8888                   # Default Snapmaker TCP port (do not change)
+WEBCAM_PATH="/dev/video0"     # If you have webcam connected to your server, you can enter the path of it to stream video
 ```
 
 Generate a secret at: [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
