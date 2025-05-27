@@ -20,7 +20,12 @@ cd snapremote-server
 ```
 
 ### 2. Install the Packages
+You need nodejs and npm installed on your device;
+```bash
+sudo apt install npm nodejs
+```
 
+Then install the necessary packages;
 ```bash
 npm install
 ```
