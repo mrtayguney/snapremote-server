@@ -50,42 +50,42 @@ try:
                 nozzle_0_diameter = float(nozzles[0])
                 nozzle_1_diameter = float(nozzles[1])
 
-        lines = fileinput.input([file_name], inplace=True)
+    lines = fileinput.input([file_name], inplace=True)
 
-        estimated_time = 0
-        for line in lines:
-            print(line, end="")
-            if '; estimated printing time (normal mode)' in line:
-                estimated_time = line.split('=')[1].strip()
+    estimated_time = 0
+    for line in lines:
+        print(line, end="")
+        if '; estimated printing time (normal mode)' in line:
+            estimated_time = line.split('=')[1].strip()
 
-        date_string = estimated_time
-        start_date = datetime(1900, 1, 1)
-        if 'h' in date_string:
-            date_object = datetime.strptime(date_string, '%Hh %Mm %Ss')
-        else:
-            date_object = datetime.strptime(date_string, '%Mm %Ss')
-        print(estimated_time)
-        time = math.floor((date_object - start_date).total_seconds())
+    date_string = estimated_time
+    start_date = datetime(1900, 1, 1)
+    if 'h' in date_string:
+        date_object = datetime.strptime(date_string, '%Hh %Mm %Ss')
+    else:
+        date_object = datetime.strptime(date_string, '%Mm %Ss')
+    print(estimated_time)
+    time = math.floor((date_object - start_date).total_seconds())
 
-        lines = fileinput.input([file_name], inplace=True)
+    lines = fileinput.input([file_name], inplace=True)
 
-        for line in lines:
-            print(line, end="")
-            if 'HEADER_BLOCK_END' in line:
-                print(";Header Start")
-                print(";estimated_time(s): " + str(time))
-                print(";thumbnail: data:image/png;base64," + thumbnail.replace("\n", ""))
-                print(";matierial_weight: " + str(filament_use_gr))
-                print(";matierial_length: " + str(filament_use_m))
-                print(";layer_number: " + str(layer_number))
-                print(";layer_height: " + str(layer_height))
-                print(";nozzle_0_material: " + str(nozzle_0_material))
-                print(";nozzle_1_material: " + str(nozzle_1_material))
-                print(";nozzle_0_diameter(mm): " + str(nozzle_0_diameter))
-                print(";nozzle_1_diameter(mm): " + str(nozzle_1_diameter))
+    for line in lines:
+        print(line, end="")
+        if 'HEADER_BLOCK_END' in line:
+            print(";Header Start")
+            print(";estimated_time(s): " + str(time))
+            print(";thumbnail: data:image/png;base64," + thumbnail.replace("\n", ""))
+            print(";matierial_weight: " + str(filament_use_gr))
+            print(";matierial_length: " + str(filament_use_m))
+            print(";layer_number: " + str(layer_number))
+            print(";layer_height: " + str(layer_height))
+            print(";nozzle_0_material: " + str(nozzle_0_material))
+            print(";nozzle_1_material: " + str(nozzle_1_material))
+            print(";nozzle_0_diameter(mm): " + str(nozzle_0_diameter))
+            print(";nozzle_1_diameter(mm): " + str(nozzle_1_diameter))
 
 
-                print(";Header End\n")
+            print(";Header End\n")
 
 
 except IOError:
