@@ -67,6 +67,7 @@ function ffmpegCommand() {
         ]);
 
         ffmpeg.on('error', function (err) {
+            console.log(err);
             throw err;
         });
 
@@ -75,6 +76,7 @@ function ffmpegCommand() {
         });
 
         ffmpeg.stderr.on('data', function (data) {
+            console.log(data);
             // console.log('stderr: ' + data);
         });
 
