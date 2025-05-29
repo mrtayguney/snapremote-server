@@ -55,7 +55,7 @@ function ffmpegCommand() {
         ffmpeg = child_process.spawn("ffmpeg", [
             '-f', 'v4l2',
             '-framerate', '25',
-            '-video_size', '640x480',
+            '-video_size', '1280x720',
             '-i', '/dev/video0',
             '-f', 'mjpeg',
             '-q:v', '5',

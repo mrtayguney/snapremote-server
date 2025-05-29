@@ -58,10 +58,8 @@
 </section>
 <section :class="'center ' +machine_status" x-data="printInfo()">
     <h3>Snapmaker</h3>
-    <img src="http://snapmaker:3000/stream">
     <div class="video-viewer" id="videoViewer">
-        <canvas class="video" id="videostream">
-        </canvas>
+        <img class="video"  src="http://snapmaker:3000/stream">
         <template x-if="!$store.is_video_playing.on">
             <div x-on:click="playVideo()" class="play-button">
                 <img src="img/video-play-icon.png"/>
