@@ -189,15 +189,15 @@ app.get('/stream', (req, res) => {
         'Pragma': 'no-cache',
     });
 
-    const pipe = fs.createReadStream(FIFO_PATH);
+    // Open a new read stream on each request
+    const pipe = fs.createReadStream(FIFO_PATH, { highWaterMark: 4096 });
     let buffer = Buffer.alloc(0);
 
     pipe.on('data', (chunk) => {
         buffer = Buffer.concat([buffer, chunk]);
 
-        // Look for JPEG SOI/EOI markers
-        const start = buffer.indexOf(Buffer.from([0xff, 0xd8]));
-        const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));
+        const start = buffer.indexOf(Buffer.from([0xff, 0xd8])); // JPEG SOI
+        const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));   // JPEG EOI
 
         if (start !== -1 && end !== -1 && end > start) {
             const frame = buffer.slice(start, end + 2);
@@ -210,7 +210,14 @@ app.get('/stream', (req, res) => {
         }
     });
 
+    pipe.on('error', (err) => {
+        console.error('Pipe error:', err.message);
+        res.end();
+    });
 
+    req.on('close', () => {
+        pipe.destroy();
+    });
 });
 
 app.get('/', function (req, res) {
