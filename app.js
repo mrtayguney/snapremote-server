@@ -46,24 +46,20 @@ const PORT = process.env.PORT || 3000;
 const WEBCAM_PATH = process.env.WEBCAM_PATH;
 
 var ffmpeg = null;
-const FIFO_PATH = '/tmp/stream.mjpeg';
 
-if (!fs.existsSync(FIFO_PATH)) {
-    child_process.execSync(`mkfifo ${FIFO_PATH}`);
-}
+let clients = [];
 
 function ffmpegCommand() {
     if(WEBCAM_PATH) {
 
         ffmpeg = child_process.spawn("ffmpeg", [
-            '-y',
             '-f', 'v4l2',
             '-framerate', '25',
-            '-video_size', '1280x720',
+            '-video_size', '640x480',
             '-i', '/dev/video0',
             '-f', 'mjpeg',
             '-q:v', '5',
-            FIFO_PATH
+            'pipe:1'
         ]);
 
         ffmpeg.on('error', function (err) {
@@ -79,10 +75,28 @@ function ffmpegCommand() {
             // console.log('stderr: ' + data);
         });
 
-        ffmpeg.stdout.on('data', function (data) {
-            var frame = new Buffer(data).toString('base64');
-            io.sockets.emit('canvas', frame);
+        let buffer = Buffer.alloc(0);
+
+        ffmpeg.stdout.on('data', (chunk) => {
+            buffer = Buffer.concat([buffer, chunk]);
+
+            const start = buffer.indexOf(Buffer.from([0xff, 0xd8])); // SOI
+            const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));   // EOI
+
+            if (start !== -1 && end !== -1 && end > start) {
+                const frame = buffer.slice(start, end + 2);
+                buffer = buffer.slice(end + 2);
+
+                // Broadcast frame to all clients
+                clients.forEach((res) => {
+                    res.write(`--frame\r\n`);
+                    res.write(`Content-Type: image/jpeg\r\n`);
+                    res.write(`Content-Length: ${frame.length}\r\n\r\n`);
+                    res.write(frame);
+                });
+            }
         });
+
     }
 }
 
@@ -189,34 +203,10 @@ app.get('/stream', (req, res) => {
         'Pragma': 'no-cache',
     });
 
-    // Open a new read stream on each request
-    const pipe = fs.createReadStream(FIFO_PATH, { highWaterMark: 4096 });
-    let buffer = Buffer.alloc(0);
-
-    pipe.on('data', (chunk) => {
-        buffer = Buffer.concat([buffer, chunk]);
-
-        const start = buffer.indexOf(Buffer.from([0xff, 0xd8])); // JPEG SOI
-        const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));   // JPEG EOI
-
-        if (start !== -1 && end !== -1 && end > start) {
-            const frame = buffer.slice(start, end + 2);
-            buffer = buffer.slice(end + 2);
-
-            res.write(`--frame\r\n`);
-            res.write(`Content-Type: image/jpeg\r\n`);
-            res.write(`Content-Length: ${frame.length}\r\n\r\n`);
-            res.write(frame);
-        }
-    });
-
-    pipe.on('error', (err) => {
-        console.error('Pipe error:', err.message);
-        res.end();
-    });
+    clients.push(res);
 
     req.on('close', () => {
-        pipe.destroy();
+        clients = clients.filter(c => c !== res);
     });
 });
 
