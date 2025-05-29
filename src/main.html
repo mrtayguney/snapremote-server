@@ -58,18 +58,25 @@
 </section>
 <section :class="'center ' +machine_status" x-data="printInfo()">
     <h3>Snapmaker</h3>
-    <div class="video-viewer" id="videoViewer">
-        <img class="video"  src="http://snapmaker:3000/stream">
-        <template x-if="!$store.is_video_playing.on">
-            <div x-on:click="playVideo()" class="play-button">
-                <img src="img/video-play-icon.png"/>
-            </div>
-        </template>
-        <template x-if="$store.is_video_playing.on">
-            <div x-on:click="pauseVideo()" class="play-button pause">
-                <img src="img/video-pause-icon.png"/>
-            </div>
-        </template>
+    <div class="video-container">
+        <div class="video-viewer" id="videoViewer">
+            <template x-if="!$store.is_video_playing.on">
+                <div class="video"></div>
+            </template>
+            <template x-if="$store.is_video_playing.on">
+                <img class="video" src="http://snapmaker:3000/stream"/>
+            </template>
+            <template x-if="!$store.is_video_playing.on">
+                <div x-on:click="playVideo()" class="play-button">
+                    <img src="img/video-play-icon.png"/>
+                </div>
+            </template>
+            <template x-if="$store.is_video_playing.on">
+                <div x-on:click="pauseVideo()" class="play-button pause">
+                    <img src="img/video-pause-icon.png"/>
+                </div>
+            </template>
+        </div>
     </div>
     <div class="print-status ">
         <div class="print-image">

@@ -303,11 +303,26 @@ section.dark {
     opacity: 0.3;
 }
 
-.video-viewer {
+.video-container {
     position: relative;
+    aspect-ratio:  16/9;
 }
 
+.video-viewer {
+    position: absolute;
+    aspect-ratio:  16/9;
+    background-color: #000;
+    overflow: hidden;
+    top: 0;
+    right:0;
+    left:0;
+    object-fit: cover;
+}
+
+
 .video-viewer .video {
+    max-width: 100%;
+    height: 100%;
 }
 
 .play-button {
