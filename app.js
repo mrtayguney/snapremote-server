@@ -81,6 +81,7 @@ function ffmpegCommand() {
         });
 
         ffmpeg.stdout.on('data', function (data) {
+            console.log(data);
             var frame = new Buffer(data).toString('base64');
             io.sockets.emit('canvas', frame);
         });
