@@ -210,9 +210,7 @@ app.get('/stream', (req, res) => {
         }
     });
 
-    req.on('close', () => {
-        pipe.destroy();
-    });
+
 });
 
 app.get('/', function (req, res) {
