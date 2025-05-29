@@ -46,19 +46,25 @@ const PORT = process.env.PORT || 3000;
 const WEBCAM_PATH = process.env.WEBCAM_PATH;
 
 var ffmpeg = null;
+const FIFO_PATH = '/tmp/stream.mjpeg';
+
+if (!fs.existsSync(FIFO_PATH)) {
+    child_process.execSync(`mkfifo ${FIFO_PATH}`);
+}
 
 function ffmpegCommand() {
     if(WEBCAM_PATH) {
 
         ffmpeg = child_process.spawn("ffmpeg", [
-            "-i", WEBCAM_PATH,
-            "-s", "854x480",
-            "-preset", "ultrafast",
-            '-acodec', 'copy',
-            "-f", "mjpeg",
-            "-r", "15",
-            "-vb", "5M",
-            "pipe:1"]);
+            '-y',
+            '-f', 'v4l2',
+            '-framerate', '25',
+            '-video_size', '1280x720',
+            '-i', '/dev/video0',
+            '-f', 'mjpeg',
+            '-q:v', '5',
+            FIFO_PATH
+        ]);
 
         ffmpeg.on('error', function (err) {
             throw err;
@@ -172,6 +178,40 @@ app.use(function (err, req, res, next) {
     console.log(err);
     if (isConnected)
         channel.connectionClose();
+});
+
+app.get('/stream', (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'multipart/x-mixed-replace; boundary=frame',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+    });
+
+    const pipe = fs.createReadStream(FIFO_PATH);
+    let buffer = Buffer.alloc(0);
+
+    pipe.on('data', (chunk) => {
+        buffer = Buffer.concat([buffer, chunk]);
+
+        // Look for JPEG SOI/EOI markers
+        const start = buffer.indexOf(Buffer.from([0xff, 0xd8]));
+        const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));
+
+        if (start !== -1 && end !== -1 && end > start) {
+            const frame = buffer.slice(start, end + 2);
+            buffer = buffer.slice(end + 2);
+
+            res.write(`--frame\r\n`);
+            res.write(`Content-Type: image/jpeg\r\n`);
+            res.write(`Content-Length: ${frame.length}\r\n\r\n`);
+            res.write(frame);
+        }
+    });
+
+    req.on('close', () => {
+        pipe.destroy();
+    });
 });
 
 app.get('/', function (req, res) {
