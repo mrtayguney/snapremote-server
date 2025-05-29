@@ -47,20 +47,23 @@ const WEBCAM_PATH = process.env.WEBCAM_PATH;
 
 var ffmpeg = null;
 
+let clients = [];
+
 function ffmpegCommand() {
     if(WEBCAM_PATH) {
 
         ffmpeg = child_process.spawn("ffmpeg", [
-            "-i", WEBCAM_PATH,
-            "-s", "854x480",
-            "-preset", "ultrafast",
-            '-acodec', 'copy',
-            "-f", "mjpeg",
-            "-r", "15",
-            "-vb", "5M",
-            "pipe:1"]);
+            '-f', 'v4l2',
+            '-framerate', '25',
+            '-video_size', '854x480',
+            '-i', '/dev/video0',
+            '-f', 'mjpeg',
+            '-q:v', '5',
+            'pipe:1'
+        ]);
 
         ffmpeg.on('error', function (err) {
+            console.log(err);
             throw err;
         });
 
@@ -72,10 +75,28 @@ function ffmpegCommand() {
             // console.log('stderr: ' + data);
         });
 
-        ffmpeg.stdout.on('data', function (data) {
-            var frame = new Buffer(data).toString('base64');
-            io.sockets.emit('canvas', frame);
+        let buffer = Buffer.alloc(0);
+
+        ffmpeg.stdout.on('data', (chunk) => {
+            buffer = Buffer.concat([buffer, chunk]);
+
+            const start = buffer.indexOf(Buffer.from([0xff, 0xd8])); // SOI
+            const end = buffer.indexOf(Buffer.from([0xff, 0xd9]));   // EOI
+
+            if (start !== -1 && end !== -1 && end > start) {
+                const frame = buffer.slice(start, end + 2);
+                buffer = buffer.slice(end + 2);
+
+                // Broadcast frame to all clients
+                clients.forEach((res) => {
+                    res.write(`--frame\r\n`);
+                    res.write(`Content-Type: image/jpeg\r\n`);
+                    res.write(`Content-Length: ${frame.length}\r\n\r\n`);
+                    res.write(frame);
+                });
+            }
         });
+
     }
 }
 
@@ -172,6 +193,21 @@ app.use(function (err, req, res, next) {
     console.log(err);
     if (isConnected)
         channel.connectionClose();
+});
+
+app.get('/stream', (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'multipart/x-mixed-replace; boundary=frame',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+    });
+
+    clients.push(res);
+
+    req.on('close', () => {
+        clients = clients.filter(c => c !== res);
+    });
 });
 
 app.get('/', function (req, res) {

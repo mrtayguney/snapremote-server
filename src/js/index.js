@@ -174,7 +174,7 @@ function printInfo() {
 
         },
         playVideo() {
-            drawVideo();
+            playVideo();
         },
         pauseVideo() {
             pauseVideo();
@@ -593,73 +593,16 @@ function printerMove() {
 let videoWidth = 0;
 let videoHeight = 0;
 
-function drawVideo() {
-    // do your drawing stuff here
-    try {
-        Alpine.store('is_video_playing').set(true);
 
-        var canvas1 = document.getElementById("videostream");
-        context = canvas1.getContext("2d");
-        context.save();
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        context.fillStyle = "#000";
-        context.fillRect(0, 0, canvas1.width, canvas1.height);
-        context.restore();
-
-        socket.off('canvas', videoToCanvas);
-
-        socket.on('canvas', videoToCanvas);
-
-
-        setTimeout(() => {
-            socket.on('canvasOff', function (data) {
-                pauseVideo();
-            });
-        }, 1000);
-    } catch (e) {
-    }
-}
-
-function videoToCanvas(data) {
-    let canvas = document.getElementById('videostream');
-    let context = canvas.getContext('2d');
-    let imageObj = new Image();
-    imageObj.src = "data:image/jpeg;base64," + data;
-    imageObj.onload = function () {
-        context.height = videoHeight;
-        context.width = videoWidth;
-        context.drawImage(imageObj, 0, 0, videoWidth, videoHeight);
-    }
-}
-
-function resizeCanvas() {
-    const canvas = document.getElementById('videostream')
-    const videoViewer = document.getElementById('videoViewer');
-    videoWidth = videoViewer.offsetWidth;
-    videoHeight = videoViewer.offsetWidth * 9 / 16;
-
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
-
-    let context = canvas.getContext("2d");
-
-    context.fillStyle = "#000";
-    context.fillRect(0, 0, videoWidth, videoHeight);
+function playVideo(){
+    Alpine.store('is_video_playing').set(true);
 }
 
 function pauseVideo() {
-    socket.removeAllListeners('canvas');
     Alpine.store('is_video_playing').set(false);
 }
 
 document.addEventListener("DOMContentLoaded", function (event) {
-    const videoViewer = document.getElementById('videoViewer');
-    videoWidth = videoViewer.offsetWidth;
-    videoHeight = videoViewer.offsetWidth * 9 / 16;
-    window.addEventListener('resize', resizeCanvas, false);
-    resizeCanvas();
-    drawVideo();
-
 
     const xyStepScroll = document.getElementById('xyStepScroll');
     xyStepScroll.scrollTo(0, 150)
