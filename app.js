@@ -15,7 +15,6 @@ import dotenv from 'dotenv';
 import _ from 'lodash';
 import multer from 'multer';
 import fs from 'fs';
-import admin from 'firebase-admin';
 import {
     newPayload,
     argumentsFromApi,
@@ -50,7 +49,7 @@ var ffmpeg = null;
 let clients = [];
 
 function ffmpegCommand() {
-    if(WEBCAM_PATH) {
+    if (WEBCAM_PATH) {
 
         ffmpeg = child_process.spawn("ffmpeg", [
             '-f', 'v4l2',
@@ -103,7 +102,7 @@ function ffmpegCommand() {
 app.use(express.json());
 app.use(cors())
 
-let httpServer = http.createServer(app);
+let httpServer = http.createServer();
 const io = new Server(httpServer);
 
 io.on('connection', async (socket) => {
