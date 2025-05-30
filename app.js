@@ -109,7 +109,7 @@ io.on('connection', async (socket) => {
     console.log('A user connected');
 
     const sockets = await io.fetchSockets();
-    console.log(sockets.length);
+    console.log('Client count:' + sockets.length);
 
     sockets.forEach((s) => {
         if (s.id !== socket.id)

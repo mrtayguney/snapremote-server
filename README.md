@@ -4,6 +4,8 @@
 
 **SnapRemote** is a Node.js server that creates an interface to connect Snapmaker devices. It also serves a web client to control your device remotely. You can run this server on a Raspberry Pi within the same local network as your Snapmaker.
 
+![web](https://github.com/mrtayguney/snapremote-server/blob/main/src/readme/web.png?raw=true)
+
 > ## ⚠️ IMPORTANT NOTE
 > SnapRemote currently supports only the **Snapmaker Artisan**, and only the **3D Printing** functionality has been tested.  
 > **Laser** and **CNC** features are not yet supported. Do not use this server for laser or CNC operations.

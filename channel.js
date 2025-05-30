@@ -213,10 +213,6 @@ export default class Channel extends BaseChannel {
                 const gcodeFileInfo = new GcodeFileInfo().fromBuffer(buffer.slice(13, buffer.length));
                 gcodeFileInfo["machineStatus"] = this.machineStatus;
                 this.currentGcodeFileInfo = gcodeFileInfo;
-            }else if(buffer[11] === 0xac && buffer[12] === 0x1a) {
-                const { nextOffset, result } = readString(buffer.slice(13, buffer.length));
-                console.log(result);
-                //console.log(buffer.slice(13, buffer.length));
             }
         });
         this.client.on('close', () => {
