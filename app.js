@@ -6,7 +6,6 @@ import Channel from './channel.js';
 import {JSONFilePreset} from 'lowdb/node'
 import child_process from 'child_process';
 import http from 'http';
-import https from 'https';
 import {Server} from 'socket.io';
 import {v4 as uuidv4} from 'uuid';
 import moment from 'moment';
@@ -103,14 +102,7 @@ function ffmpegCommand() {
 app.use(express.json());
 app.use(cors())
 
-
-const options = {
-    key: fs.readFileSync('./ssl/server.key'),
-    cert: fs.readFileSync('./ssl/fullchain.crt'),
-};
-
-
-let httpServer = process.env.USE_HTTPS==="True" ? https.createServer(options, app) : http.createServer(app);
+let httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
 io.on('connection', async (socket) => {
@@ -157,7 +149,7 @@ io.on('connection', async (socket) => {
 });
 
 httpServer.listen(PORT, () => {
-    console.log('listening on localhost:' + PORT);
+    console.log('listening on localhost: 3000');
 })
 
 app.use(express.static('src'))
@@ -744,16 +736,3 @@ app.post("/setNotificationToken", async (request, response) => {
     }
 })
 
-app.post("/bedLevel", (request, response) => {
-    if (!isConnected) {
-        response.send({"Status": "Disconnected"});
-        return;
-    }
-    channel.bedLevel().then((resp) => {
-        const status = {
-            "Status": "OK",
-            "Response": JSON.stringify({})
-        };
-        response.send(status);
-    })
-});
