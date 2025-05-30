@@ -1,4 +1,3 @@
-import admin from "firebase-admin";
 import {JSONFilePreset} from "lowdb/node";
 
 const mainDb = await JSONFilePreset('mainDb.json', {})
