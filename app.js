@@ -110,7 +110,7 @@ const options = {
 };
 
 
-let httpServer = process.env.USE_HTTPS ? https.createServer(options, app) : http.createServer(app);
+let httpServer = process.env.USE_HTTPS==="True" ? https.createServer(options, app) : http.createServer(app);
 const io = new Server(httpServer);
 
 io.on('connection', async (socket) => {
@@ -157,7 +157,7 @@ io.on('connection', async (socket) => {
 });
 
 httpServer.listen(PORT, () => {
-    console.log('listening on localhost: 3000');
+    console.log('listening on localhost:' + PORT);
 })
 
 app.use(express.static('src'))
