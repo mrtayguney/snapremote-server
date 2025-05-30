@@ -105,9 +105,8 @@ app.use(cors())
 
 
 const options = {
-    key: fs.readFileSync('./ssl/server-key.pem'),
-    cert: fs.readFileSync('./ssl/fullchain.pem'),
-    ca: fs.readFileSync('./ssl/ca-cert.pem')
+    key: fs.readFileSync('./ssl/server.key'),
+    cert: fs.readFileSync('./ssl/fullchain.crt'),
 };
 
 
