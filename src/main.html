@@ -64,7 +64,7 @@
                 <div class="video"></div>
             </template>
             <template x-if="$store.is_video_playing.on">
-                <img class="video" :src="/stream"/>
+                <img class="video" src="/stream"/>
             </template>
             <template x-if="!$store.is_video_playing.on">
                 <div x-on:click="playVideo()" class="play-button">
