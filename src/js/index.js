@@ -625,4 +625,5 @@ document.addEventListener('alpine:init', () => {
             this.status = status;
         }
     });
+
 })
