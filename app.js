@@ -102,7 +102,7 @@ function ffmpegCommand() {
 app.use(express.json());
 app.use(cors())
 
-let httpServer = http.createServer();
+let httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
 io.on('connection', async (socket) => {
