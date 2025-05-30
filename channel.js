@@ -668,7 +668,6 @@ export default class Channel extends BaseChannel {
                     const result = readString(data.response.data, 1).result;
                     if (result === null) {
                     }
-                    //console.log(result)
                     if(result.includes('print finish'))
                         sendNotificaiton("Job Finished", "Your job is finished.", {})
 
@@ -711,5 +710,11 @@ export default class Channel extends BaseChannel {
 
             io.sockets.emit("deviceError", { level, owner, errorCode });
         });
+    }
+
+    async bedLevel(){
+        await this.sacpClient.executeGcode("G28");
+        await this.sacpClient.executeGcode("G1029 A");
+
     }
 }

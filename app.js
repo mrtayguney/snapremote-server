@@ -6,6 +6,7 @@ import Channel from './channel.js';
 import {JSONFilePreset} from 'lowdb/node'
 import child_process from 'child_process';
 import http from 'http';
+import https from 'https';
 import {Server} from 'socket.io';
 import {v4 as uuidv4} from 'uuid';
 import moment from 'moment';
@@ -102,7 +103,14 @@ function ffmpegCommand() {
 app.use(express.json());
 app.use(cors())
 
-let httpServer = http.createServer(app);
+
+const options = {
+    key: fs.readFileSync('./ssl/key.pem'),
+    cert: fs.readFileSync('./ssl/cert.pem')
+};
+
+
+let httpServer = process.env.USE_HTTPS ? https.createServer(options, app) : http.createServer(app);
 const io = new Server(httpServer);
 
 io.on('connection', async (socket) => {
@@ -439,7 +447,8 @@ app.post("/home", authCheck, (request, response) => {
     }
     channel.home().then((resp) => {
         const status = {
-            "Status": "OK"
+            "Status": "OK",
+            "Response": JSON.stringify({})
         };
         response.send(status);
     })
@@ -507,7 +516,8 @@ app.post("/loadFilament", authCheck, (request, response) => {
     }
     channel.loadFilament(request.body["index"]).then((resp) => {
         const status = {
-            "Status": "OK"
+            "Status": "OK",
+            "Response": JSON.stringify({})
         };
         response.send(status);
     })
@@ -520,7 +530,8 @@ app.post("/unloadFilament", authCheck, (request, response) => {
     }
     channel.unloadFilament(request.body["index"]).then((resp) => {
         const status = {
-            "Status": "OK"
+            "Status": "OK",
+            "Response": JSON.stringify({})
         };
         response.send(status);
     })
@@ -733,3 +744,16 @@ app.post("/setNotificationToken", async (request, response) => {
     }
 })
 
+app.post("/bedLevel", (request, response) => {
+    if (!isConnected) {
+        response.send({"Status": "Disconnected"});
+        return;
+    }
+    channel.bedLevel().then((resp) => {
+        const status = {
+            "Status": "OK",
+            "Response": JSON.stringify({})
+        };
+        response.send(status);
+    })
+});
