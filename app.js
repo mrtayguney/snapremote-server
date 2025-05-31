@@ -241,7 +241,7 @@ app.post("/login", (request, response) => {
     } else {
         const status = {
             "Status": "FAILED",
-            "Response": ""
+            "Response": JSON.stringify({})
         };
         response.send(status);
     }

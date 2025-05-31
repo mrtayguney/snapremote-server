@@ -112,18 +112,18 @@
             </div>
         </div>
     </div>
-    <template x-if="machine_status=='running' && time_remaining!=''">
+    <template x-if="machine_status!='idle' && time_remaining!=''">
         <div class="progress-info">
             <div class="progress-text" x-text="(machine_status!='idle'?progress:0) + '%'"></div>
             <div class="line-info" x-show="total_layer>0" x-text="current_layer+'/'+total_layer"></div>
         </div>
     </template>
-    <template x-if="machine_status=='running' && time_remaining!=''">
+    <template x-if="machine_status!='idle' && time_remaining!=''">
         <div class="progress-bar">
             <div class="progress-bar-fill" :style="'width:'+(machine_status!='idle'?progress:0)+'%'"></div>
         </div>
     </template>
-    <template x-if="machine_status=='running'">
+    <template x-if="machine_status!='idle'">
         <div class="finish-time" x-show="finish_time!==''" x-text="'Finish Time: '+finish_time"></div>
     </template>
 </section>

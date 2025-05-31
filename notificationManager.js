@@ -4,7 +4,7 @@ const mainDb = await JSONFilePreset('mainDb.json', {})
 
 export default function sendNotificaiton(title, body, data) {
     if (mainDb && mainDb.data && mainDb.data["notificationToken"]) {
-        fetch('https://snapremote-notification.onrender.com/sendNotification', {
+        fetch('https://snapremote-notification-1.onrender.com/sendNotification', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
