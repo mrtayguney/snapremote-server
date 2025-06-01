@@ -457,7 +457,6 @@ export default class Channel extends BaseChannel {
     }
 
 
-
     async subscribeGetPrintCurrentLineNumber(db, io) {
         return new Promise((resolve, reject) => {
             if (this.printLineSubscribed) {
@@ -478,7 +477,7 @@ export default class Channel extends BaseChannel {
                                     let foundItem = files.find((item) => item.name === fileInfo.gcodeName);
                                     //this.sacpClient.getPrintingFileInfo();
 
-                                    if(foundItem) {
+                                    if (foundItem) {
                                         let progress = foundItem["progress_layers"][0].progress;
                                         let timeRemaining = foundItem["progress_layers"][0].timeRemaining;
                                         let currentLayer = 1;
@@ -513,8 +512,7 @@ export default class Channel extends BaseChannel {
                                         }
                                         io.sockets.emit('printInfo', this.printProgress);
                                         resolve(this.printProgress);
-                                    }
-                                    else{
+                                    } else {
                                         this.printLineSubscribed = true;
                                         this.printProgress = {
                                             "progress": 0,
@@ -662,18 +660,22 @@ export default class Channel extends BaseChannel {
             return;
         }
 
-        this.sacpClient.logFeedbackLevel(2).then(({ response }) => {
+        this.sacpClient.logFeedbackLevel(2).then(({response}) => {
             if (response.result === 0) {
                 this.subscribeLogCallback = (data) => {
                     const result = readString(data.response.data, 1).result;
                     if (result === null) {
                     }
-                    if(result.includes('print finish'))
+                    if (result.includes('print finish'))
                         sendNotificaiton("Job Finished", "Your job is finished.", {})
+                    else if (result.includes('hmi request start bedlevel'))
+                        sendNotificaiton("Bed Leveling Start", "Bed leveling started.", {})
+                    else if (result.includes('hmi request exit bedlevel mode'))
+                        sendNotificaiton("Bed Leveling End", "Bed leveling ended.", {})
 
-                   io.sockets.emit('serialport:read', { data: result });
+                    io.sockets.emit('serialport:read', {data: result});
                 };
-                this.sacpClient.subscribeLogFeedback({ interval: 60000 }, this.subscribeLogCallback);
+                this.sacpClient.subscribeLogFeedback({interval: 5000}, this.subscribeLogCallback);
             }
         });
 
@@ -699,20 +701,20 @@ export default class Channel extends BaseChannel {
         });
 
         // Set error report handler
-        this.sacpClient.setHandler(0x04, 0x00, ({ param }) => {
+        this.sacpClient.setHandler(0x04, 0x00, ({param}) => {
             const level = readUint8(param, 0);
             const owner = readUint16(param, 1);
             const errorCode = readUint8(param, 3);
-            if(errorCode===12 && owner===13)
+            if (errorCode === 12 && owner === 13)
                 sendNotificaiton("Error", "The extruder is continuously pulled up and printing is paused.", {})
-            if(errorCode===11 && owner===13)
+            if (errorCode === 11 && owner === 13)
                 sendNotificaiton("Error", "Filament run out detected and printing is paused.", {})
 
-            io.sockets.emit("deviceError", { level, owner, errorCode });
+            io.sockets.emit("deviceError", {level, owner, errorCode});
         });
     }
 
-    async bedLevel(){
+    async bedLevel() {
         await this.sacpClient.executeGcode("G28");
         await this.sacpClient.executeGcode("G1029 A");
 
