@@ -98,7 +98,7 @@ function printInfo() {
                             let jsonInfo = data;
                             this.machine_status = jsonInfo.machineStatus;
                             this.file_name = jsonInfo.fileName;
-                            this.time_remaining = moment.utc(jsonInfo.timeRemaining * 60 * 1000).format('HH [hours] mm [minutes] ss [seconds]').replace('00 hours ', '').replace('00 minutes ', '').replace('00 seconds', '');
+                            this.time_remaining = moment.utc(jsonInfo.timeRemaining * 60 * 1000).format('D [days] H [hours] m [minutes] s [seconds]').replace('0 days ', '').replace('0 hours ', '').replace('0 minutes ', '').replace('0 seconds', '');
                             this.progress = jsonInfo.progress;
                             this.current_layer = jsonInfo.currentLayer;
                             this.total_layer = jsonInfo.totalLayer;
