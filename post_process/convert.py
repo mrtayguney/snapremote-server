@@ -4,8 +4,29 @@ import sys
 import fileinput
 from datetime import datetime
 import math
+import re
 
 file_name = sys.argv[1]
+
+def duration_to_seconds(duration_str):
+    # Map suffixes to seconds
+    unit_seconds = {
+        'd': 86400,
+        'h': 3600,
+        'm': 60,
+        's': 1
+    }
+
+    total_seconds = 0
+
+    # Find all number-unit pairs
+    matches = re.findall(r'(\d+)\s*([dhms])', duration_str)
+
+    for value, unit in matches:
+        if unit in unit_seconds:
+            total_seconds += int(value) * unit_seconds[unit]
+
+    return total_seconds
 
 try:
     with open(file_name, 'r') as file:
@@ -59,13 +80,7 @@ try:
             estimated_time = line.split('=')[1].strip()
 
     date_string = estimated_time
-    start_date = datetime(1900, 1, 1)
-    if 'h' in date_string:
-        date_object = datetime.strptime(date_string, '%Hh %Mm %Ss')
-    else:
-        date_object = datetime.strptime(date_string, '%Mm %Ss')
-    print(estimated_time)
-    time = math.floor((date_object - start_date).total_seconds())
+    time = duration_to_seconds(date_string)
 
     lines = fileinput.input([file_name], inplace=True)
 
