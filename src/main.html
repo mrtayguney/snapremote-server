@@ -40,7 +40,18 @@
                         <div class="file-subinfo-item">
                             <div class="file-subinfo-item-icon"><img src="img/clock-icon.png"/></div>
                             <div class="file-subinfo-item-text"
-                                 x-text="moment.utc(item.estimated_time*1000).format('HH[h] mm[m]').replace('00h ', '').replace('00m ', '')"></div>
+                                 x-text="()=>{
+                                 const seconds = item.estimated_time;
+                                 const d = moment.duration(seconds, 'seconds');
+
+                                 const str =  [['d', 'days'], ['h', 'hours'], ['m', 'minutes'], ['s', 'seconds']]
+                                .map(([short, full]) => d.get(full) ? `${d.get(full)}${short}` : '')
+                                  .filter(Boolean)
+                                  .join(' ');
+
+
+                                return str;
+                                 }"></div>
                         </div>
                         <div class="file-subinfo-item">
                             <div class="file-subinfo-item-icon"><img src="img/date-icon.png"/></div>

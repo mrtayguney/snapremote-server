@@ -96,14 +96,26 @@ function printInfo() {
                     if (json.Status === "OK") {
                         let callback = (data) => {
                             let jsonInfo = data;
+
+                            const seconds = jsonInfo.timeRemaining * 60;
+                            const d = moment.duration(seconds, 'seconds');
+
+                            const str = ['days', 'hours', 'minutes', 'seconds']
+                                .map(unit => {
+                                    const val = d.get(unit);
+                                    return val ? `${val} ${unit.slice(0, -1)}${val > 1 ? 's' : ''}` : '';
+                                })
+                                .filter(Boolean)
+                                .join(' ');
+
                             this.machine_status = jsonInfo.machineStatus;
                             this.file_name = jsonInfo.fileName;
-                            this.time_remaining = moment.utc(jsonInfo.timeRemaining * 60 * 1000).format('D [days] H [hours] m [minutes] s [seconds]').replace('0 days ', '').replace('0 hours ', '').replace('0 minutes ', '').replace('0 seconds', '');
+                            this.time_remaining = str;
                             this.progress = jsonInfo.progress;
                             this.current_layer = jsonInfo.currentLayer;
                             this.total_layer = jsonInfo.totalLayer;
                             this.image = jsonInfo.image;
-                            if (jsonInfo.time_remaining > 0) {
+                            if (jsonInfo.time_remaining !== '') {
                                 let finishDateTime = moment.utc().add(jsonInfo.timeRemaining * 60 * 1000)
                                 if (finishDateTime.diff(moment.utc(), 'days') > 0)
                                     this.finish_time = finishDateTime.local().format("dddd DD MMM, HH:mm");
@@ -594,7 +606,7 @@ let videoWidth = 0;
 let videoHeight = 0;
 
 
-function playVideo(){
+function playVideo() {
     Alpine.store('is_video_playing').set(true);
 }
 
