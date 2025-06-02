@@ -585,15 +585,32 @@ app.post("/api/files/local", upload.single('file'), async (request, response) =>
             console.error(err);
         }
 
-        fs.writeFile('./files/' + file.originalname, file.buffer, async (err) => {
+        let id = uuidv4();
+        let fileName=file.originalname;
+        let dir='files'
+
+        const ext = path.extname(fileName);
+        const base = path.basename(fileName, ext);
+        let candidate = fileName;
+        let counter = 1;
+
+        while (fs.existsSync(path.join(dir, candidate))) {
+            candidate = `${base}(${counter})${ext}`;
+            counter++;
+        }
+
+        let filePath=dir+'/'+candidate;
+
+
+        fs.writeFile(filePath, file.buffer, async (err) => {
             if (err) {
                 console.error(err);
             } else {
-                const fileInfo = await getGcodeProps('./files/' + file.originalname);
+                const fileInfo = await getGcodeProps(filePath);
 
                 const fileData = {
-                    id: uuidv4(),
-                    name: file.originalname,
+                    id: id,
+                    name: candidate,
                     nozzle1_material: fileInfo["nozzle1_material"],
                     nozzle2_material: fileInfo["nozzle2_material"],
                     material_use: fileInfo["material_use"],
