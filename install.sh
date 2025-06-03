@@ -1,8 +1,6 @@
 #!/bin/bash
 
-set -x
 
-set -e
 REPO_URL="https://github.com/mrtayguney/snapremote-server.git"
 INSTALL_DIR="snapremote-server"
 SERVICE_NAME="snapremote"
