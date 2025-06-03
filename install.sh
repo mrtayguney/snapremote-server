@@ -28,6 +28,7 @@ npm install || echo
 
 # Ask if user wants to create a systemd service
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
+
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   echo "🔧 Creating systemd service..."
   sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service" <<EOF
@@ -60,6 +61,7 @@ fi
 
 # Ask if user wants to set up .env
 read -r -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env
+
 if [[ "$setup_env" =~ ^[Yy]$ ]]; then
   if [ ! -f ".env" ]; then
     echo "📝 Let's create your .env file..."
