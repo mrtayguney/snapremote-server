@@ -14,14 +14,21 @@
 
 ## ⚙️ Setup
 
-### 1. Clone the Repository
+### Easy Installer
+```bash
+curl -sL https://raw.githubusercontent.com/mrtayguney/snapremote-server/main/install.sh | bash
+```
+
+or do it manually;
+
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/mrtayguney/snapremote-server.git
 cd snapremote-server
 ```
 
-### 2. Install the Packages
+#### 2. Install the Packages
 You must install Node.js and npm to your device;
 ```bash
 sudo apt install npm nodejs
@@ -32,7 +39,7 @@ Then install the necessary packages;
 npm install
 ```
 
-### 3. Create Environment Variables
+#### 3. Create Environment Variables
 
 ```bash
 touch .env
