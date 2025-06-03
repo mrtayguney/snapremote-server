@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 REPO_URL="https://github.com/mrtayguney/snapremote-server.git"
 INSTALL_DIR="snapremote-server"
@@ -25,9 +24,10 @@ fi
 
 # Install npm packages
 echo "📦 Installing npm packages..."
-npm install
+npm install || echo
 
 # Ask if user wants to create a systemd service
+set -x
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
