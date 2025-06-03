@@ -31,14 +31,15 @@ read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n
 
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   echo "🔧 Creating systemd service..."
+  CURRENT_DIR=$(pwd)
   sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service" <<EOF
 [Unit]
 Description=SnapRemote 3D Printer Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/node \"$PWD/app.js\"
-WorkingDirectory=\"$PWD\"
+ExecStart=/usr/bin/node $CURRENT_DIR/index.js
+WorkingDirectory=$CURRENT_DIR
 Restart=always
 User=pi
 Environment=NODE_ENV=production
