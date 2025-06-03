@@ -360,6 +360,8 @@ function printerControl() {
 
             if (Alpine.store('machine_status')["status"] === "idle")
                 this.switch_enabled = true;
+            else
+                this.switch_enabled = false;
         },
         setHeatbedInfo(data) {
             let jsonInfo = data;
