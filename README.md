@@ -18,6 +18,8 @@
 ```bash
 curl -sL https://raw.githubusercontent.com/mrtayguney/snapremote-server/main/install.sh | bash
 ```
+> #### ⚠️ .env parameters
+>You will asked to create .env file with some parameters. The parameters are explained bellow.
 
 or do it manually;
 
