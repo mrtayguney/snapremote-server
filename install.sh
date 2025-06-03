@@ -27,7 +27,7 @@ echo "📦 Installing npm packages..."
 npm install || echo
 
 # Ask if user wants to create a systemd service
-read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
+read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service < /dev/tty
 
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   echo "🔧 Creating systemd service..."
@@ -60,7 +60,7 @@ else
 fi
 
 # Ask if user wants to set up .env
-read -r -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env
+read -r -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env < /dev/tty
 
 if [[ "$setup_env" =~ ^[Yy]$ ]]; then
   if [ ! -f ".env" ]; then
