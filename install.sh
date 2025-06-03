@@ -28,20 +28,21 @@ npm install || echo
 
 # Ask if user wants to create a systemd service
 set -x
-read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
+echo "🛠️  Do you want to run SnapRemote as a background service? (y/n): "
+read -r setup_service < /dev/tty
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
   CURRENT_DIR="$PWD"
 
   echo "🔧 Creating systemd service..."
-  sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+  sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service" <<EOF
 [Unit]
 Description=SnapRemote 3D Printer Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/node "$CURRENT_DIR/index.js"
-WorkingDirectory="$CURRENT_DIR"
+ExecStart=/usr/bin/node \"$PWD/index.js\"
+WorkingDirectory=\"$PWD\"
 Restart=always
 User=pi
 Environment=NODE_ENV=production
