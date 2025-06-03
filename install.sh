@@ -31,8 +31,7 @@ npm install
 
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
-  SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
-  sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+  sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null <<EOF
 [Unit]
 Description=SnapRemote 3D Printer Server
 After=network.target
