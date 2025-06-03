@@ -29,9 +29,6 @@ npm install || echo
 # Ask if user wants to create a systemd service
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
-  SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
-  CURRENT_DIR="$PWD"
-
   echo "🔧 Creating systemd service..."
   sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service" <<EOF
 [Unit]
