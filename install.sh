@@ -40,8 +40,8 @@ Description=SnapRemote 3D Printer Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/node $CURRENT_DIR/index.js
-WorkingDirectory=$CURRENT_DIR
+ExecStart=/usr/bin/node "$CURRENT_DIR/index.js"
+WorkingDirectory="$CURRENT_DIR"
 Restart=always
 User=pi
 Environment=NODE_ENV=production
