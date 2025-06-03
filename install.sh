@@ -1,30 +1,29 @@
 #!/bin/bash
 
-REPO_URL="https://github.com/mrtayguney/snapremote-server.git"
+#!/bin/bash
+set -e
+
+REPO="mrtayguney/snapremote-server"
 INSTALL_DIR="snapremote-server"
-SERVICE_NAME="snapremote"
 
-echo "📦 Installing SnapRemote..."
+echo "📦 Installing SnapRemote from latest GitHub release..."
 
-# Clone the repo if it doesn't exist
-if [ ! -d "$INSTALL_DIR" ]; then
-  git clone "$REPO_URL" "$INSTALL_DIR"
-else
-  echo "📁 Repo already cloned at $INSTALL_DIR"
-fi
+# Get latest release tag from GitHub API
+LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep tag_name | cut -d '"' -f4)
 
+echo "🔖 Latest release: $LATEST_TAG"
+
+# Download and extract
+curl -L "https://github.com/$REPO/archive/refs/tags/$LATEST_TAG.tar.gz" -o snapremote.tar.gz
+tar -xzf snapremote.tar.gz
+rm snapremote.tar.gz
+
+# Move extracted folder to target
+mv "snapremote-server-$LATEST_TAG" "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
-# Install Node.js if not installed
-if ! command -v node &> /dev/null; then
-  echo "🔧 Installing Node.js..."
-  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  sudo apt install -y nodejs
-fi
-
-# Install npm packages
-echo "📦 Installing npm packages..."
-npm install || echo
+echo "📦 Installing dependencies..."
+npm install
 
 # Ask if user wants to create a systemd service
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service < /dev/tty
