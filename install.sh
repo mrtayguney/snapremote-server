@@ -31,7 +31,7 @@ npm install
 
 # Ask user if they want a system service
 
-read -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
+read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
   sudo bash -c "cat > $SERVICE_FILE" <<EOF
