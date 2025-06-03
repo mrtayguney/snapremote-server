@@ -37,7 +37,7 @@ Description=SnapRemote 3D Printer Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/node \"$PWD/index.js\"
+ExecStart=/usr/bin/node \"$PWD/app.js\"
 WorkingDirectory=\"$PWD\"
 Restart=always
 User=pi
