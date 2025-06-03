@@ -66,16 +66,16 @@ if [[ "$setup_env" =~ ^[Yy]$ ]]; then
   if [ ! -f ".env" ]; then
     echo "📝 Let's create your .env file..."
 
-    read -r -p "🔑 JWT_SECRET_KEY (e.g. from jwt.io): " jwt
-    read -r -p "🌐 PORT (e.g. 3000): " port
-    read -r -p "🧩 DEVICE_IP (Snapmaker printer's IP): " ip
+    read -r -p "🔑 JWT_SECRET_KEY (e.g. from jwt.io): " jwt < /dev/tty
+    read -r -p "🌐 PORT (e.g. 3000): " port < /dev/tty
+    read -r -p "🧩 DEVICE_IP (Snapmaker printer's IP): " ip < /dev/tty
 
     # Detect webcam automatically
     default_webcam=$(ls /dev/video* 2>/dev/null | head -n 1)
     if [ -n "$default_webcam" ]; then
       echo "📷 Detected webcam at: $default_webcam"
     fi
-    read -r -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam
+    read -r -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam < /dev/tty
 
     # Use default if nothing typed
     if [ -z "$webcam" ] && [ -n "$default_webcam" ]; then
