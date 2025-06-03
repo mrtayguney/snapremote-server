@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 REPO_URL="https://github.com/mrtayguney/snapremote-server.git"
 INSTALL_DIR="snapremote-server"
@@ -7,33 +7,33 @@ SERVICE_NAME="snapremote"
 
 echo "📦 Installing SnapRemote..."
 
-# Clone if not already
+# Clone the repo if it doesn't exist
 if [ ! -d "$INSTALL_DIR" ]; then
-  git clone $REPO_URL $INSTALL_DIR
+  git clone "$REPO_URL" "$INSTALL_DIR"
 else
   echo "📁 Repo already cloned at $INSTALL_DIR"
 fi
 
-cd $INSTALL_DIR
+cd "$INSTALL_DIR"
 
-# Install Node.js if missing
+# Install Node.js if not installed
 if ! command -v node &> /dev/null; then
   echo "🔧 Installing Node.js..."
   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
   sudo apt install -y nodejs
 fi
 
-# Install dependencies
+# Install npm packages
 echo "📦 Installing npm packages..."
 npm install
 
-# Ask user if they want a system service
-
+# Ask if user wants to create a systemd service
 read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
   CURRENT_DIR="$PWD"
 
+  echo "🔧 Creating systemd service..."
   sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=SnapRemote 3D Printer Server
@@ -54,38 +54,37 @@ EOF
 
   sudo systemctl daemon-reexec
   sudo systemctl daemon-reload
-  sudo systemctl enable $SERVICE_NAME
-  sudo systemctl start $SERVICE_NAME
+  sudo systemctl enable "$SERVICE_NAME"
+  sudo systemctl start "$SERVICE_NAME"
 
   echo "✅ Service '$SERVICE_NAME' installed and started."
 else
   echo "⚠️ Skipped background service setup. You can run it manually with: node index.js"
 fi
 
-# Ask user if they want to create .env
-read -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env
+# Ask if user wants to set up .env
+read -r -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env
 if [[ "$setup_env" =~ ^[Yy]$ ]]; then
   if [ ! -f ".env" ]; then
     echo "📝 Let's create your .env file..."
 
-    read -p "🔑 JWT_SECRET_KEY (e.g. from jwt.io): " jwt
-    read -p "🌐 PORT (e.g. 3000): " port
-    read -p "🧩 DEVICE_IP (Snapmaker printer's IP): " ip
+    read -r -p "🔑 JWT_SECRET_KEY (e.g. from jwt.io): " jwt
+    read -r -p "🌐 PORT (e.g. 3000): " port
+    read -r -p "🧩 DEVICE_IP (Snapmaker printer's IP): " ip
 
-    # Attempt to auto-detect webcam
+    # Detect webcam automatically
     default_webcam=$(ls /dev/video* 2>/dev/null | head -n 1)
     if [ -n "$default_webcam" ]; then
       echo "📷 Detected webcam at: $default_webcam"
     fi
-    read -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam
+    read -r -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam
 
-    # Use default if not empty and user didn’t type one
+    # Use default if nothing typed
     if [ -z "$webcam" ] && [ -n "$default_webcam" ]; then
       webcam="$default_webcam"
     fi
 
     echo "✅ Writing .env file in $PWD..."
-
     cat > .env <<EOF
 JWT_SECRET_KEY=${jwt}
 PORT=${port}
@@ -93,7 +92,6 @@ DEVICE_IP=${ip}
 DEVICE_PORT=8888
 EOF
 
-    # Append WEBCAM_PATH only if set
     if [ -n "$webcam" ]; then
       echo "WEBCAM_PATH=\"${webcam}\"" >> .env
     fi
@@ -105,6 +103,5 @@ EOF
 else
   echo "⚠️ Skipped .env file setup."
 fi
-
 
 echo "✅ SnapRemote installed in $PWD"
