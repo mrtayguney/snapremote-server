@@ -212,6 +212,8 @@ function files() {
         },
         toggleFiles() {
             this.open = !this.open;
+            if(this.open)
+                this.init();
         },
         deleteFile(id) {
             if (confirm("Are you sure to delete the file?")) {
