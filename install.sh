@@ -28,6 +28,7 @@ echo "📦 Installing npm packages..."
 npm install
 
 # Ask user if they want a system service
+echo "DEBUG: About to ask for background service setup..."
 read -p "🛠️  Do you want to run SnapRemote as a background service? (y/n): " setup_service
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   SERVICE_FILE="/etc/systemd/system/$SERVICE_NAME.service"
