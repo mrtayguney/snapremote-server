@@ -94,9 +94,6 @@ EOF
   fi
 
   echo "✅ .env created at $PWD/.env"
-
-  fi
-
 else
   echo "⚠️ Skipped .env file setup."
 fi
