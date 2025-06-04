@@ -31,7 +31,8 @@ read -r -p "🛠️  Do you want to run SnapRemote as a background service? (y/n
 if [[ "$setup_service" =~ ^[Yy]$ ]]; then
   echo "🔧 Creating systemd service..."
   CURRENT_DIR=$(pwd)
-  sudo bash -c "cat > /etc/systemd/system/$SERVICE_NAME.service" <<EOF
+
+  sudo tee /etc/systemd/system/$SERVICE_NAME.service > /dev/null <<EOF
 [Unit]
 Description=SnapRemote 3D Printer Server
 After=network.target
@@ -60,38 +61,32 @@ else
 fi
 
 # Ask if user wants to set up .env
-read -r -p "🛠️  Do you want to setup your .env file? (y/n): " setup_env < /dev/tty
+read -r -p "🛠️  Do you want to set up your .env file? (y/n): " setup_env < /dev/tty
 
 if [[ "$setup_env" =~ ^[Yy]$ ]]; then
   echo "📝 Let's create your .env file..."
 
   read -r -p "🔑 JWT_SECRET_KEY (e.g. from jwt.io): " jwt < /dev/tty
   read -r -p "🌐 PORT (e.g. 3000): " port < /dev/tty
-  read -r -p "🧩 DEVICE_IP (Snapmaker printer's IP): " ip < /dev/tty
+  read -r -p "🖨️  DEVICE_IP (Snapmaker printer's IP): " ip < /dev/tty
 
   # Detect webcam automatically
   default_webcam=$(ls /dev/video* 2>/dev/null | head -n 1)
   if [ -n "$default_webcam" ]; then
     echo "📷 Detected webcam at: $default_webcam"
   fi
-  read -r -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam < /dev/tty
 
-  # Use default if nothing typed
-  if [ -z "$webcam" ] && [ -n "$default_webcam" ]; then
-    webcam="$default_webcam"
-  fi
+  read -r -p "📷 WEBCAM_PATH (Press Enter to skip) [default: $default_webcam]: " webcam < /dev/tty
+  [ -z "$webcam" ] && [ -n "$default_webcam" ] && webcam="$default_webcam"
 
   echo "✅ Writing .env file in $PWD..."
-  cat > .env <<EOF
-JWT_SECRET_KEY=${jwt}
-PORT=${port}
-DEVICE_IP=${ip}
-DEVICE_PORT=8888
-EOF
-
-  if [ -n "$webcam" ]; then
-    echo "WEBCAM_PATH=\"${webcam}\"" >> .env
-  fi
+  {
+    echo "JWT_SECRET_KEY=$jwt"
+    echo "PORT=$port"
+    echo "DEVICE_IP=$ip"
+    echo "DEVICE_PORT=8888"
+    [ -n "$webcam" ] && echo "WEBCAM_PATH=\"$webcam\""
+  } > .env
 
   echo "✅ .env created at $PWD/.env"
 else
