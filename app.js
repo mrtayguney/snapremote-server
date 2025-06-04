@@ -581,62 +581,61 @@ app.post("/api/files/local", upload.single('file'), async (request, response) =>
             if (!fs.existsSync(folderName)) {
                 fs.mkdirSync(folderName);
             }
+            let id = uuidv4();
+            let fileName=file.originalname;
+            let dir='files'
+
+            const ext = path.extname(fileName);
+            const base = path.basename(fileName, ext);
+            let candidate = fileName;
+            let counter = 1;
+
+            while (fs.existsSync(path.join(dir, candidate))) {
+                candidate = `${base}(${counter})${ext}`;
+                counter++;
+            }
+
+            let filePath=dir+'/'+candidate;
+
+
+            fs.writeFile(filePath, file.buffer, async (err) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    const fileInfo = await getGcodeProps(filePath);
+
+                    const fileData = {
+                        id: id,
+                        name: candidate,
+                        nozzle1_material: fileInfo["nozzle1_material"],
+                        nozzle2_material: fileInfo["nozzle2_material"],
+                        material_use: fileInfo["material_use"],
+                        is_deleted: false,
+                        upload_date: moment().unix(),
+                        estimated_time: fileInfo["estimated_time"],
+                        image: fileInfo["thumbnail"],
+                        layer_number: fileInfo["layer_number"],
+                        layer_changes: fileInfo["layer_changes"],
+                        progress_layers: fileInfo["progress_layers"],
+                    }
+                    db.data.files.push(fileData)
+                    await db.write()
+
+                    if (isConnected && request.body["print"] === "true") {
+                        await channel.uploadFile('./files/' + file.originalname, file.originalname);
+                        channel.startPrint(file.originalname);
+                    }
+                }
+
+
+            });
+
+            console.log(`Upload finished: ${file.originalname} [${payload.readableSize()}]`);
+            writeResponse(response, 200, {done: true});
+
         } catch (err) {
             console.error(err);
         }
-
-        let id = uuidv4();
-        let fileName=file.originalname;
-        let dir='files'
-
-        const ext = path.extname(fileName);
-        const base = path.basename(fileName, ext);
-        let candidate = fileName;
-        let counter = 1;
-
-        while (fs.existsSync(path.join(dir, candidate))) {
-            candidate = `${base}(${counter})${ext}`;
-            counter++;
-        }
-
-        let filePath=dir+'/'+candidate;
-
-
-        fs.writeFile(filePath, file.buffer, async (err) => {
-            if (err) {
-                console.error(err);
-            } else {
-                const fileInfo = await getGcodeProps(filePath);
-
-                const fileData = {
-                    id: id,
-                    name: candidate,
-                    nozzle1_material: fileInfo["nozzle1_material"],
-                    nozzle2_material: fileInfo["nozzle2_material"],
-                    material_use: fileInfo["material_use"],
-                    is_deleted: false,
-                    upload_date: moment().unix(),
-                    estimated_time: fileInfo["estimated_time"],
-                    image: fileInfo["thumbnail"],
-                    layer_number: fileInfo["layer_number"],
-                    layer_changes: fileInfo["layer_changes"],
-                    progress_layers: fileInfo["progress_layers"],
-                }
-                db.data.files.push(fileData)
-                await db.write()
-
-                if (isConnected && request.body["print"] === "true") {
-                    await channel.uploadFile('./files/' + file.originalname, file.originalname);
-                    channel.startPrint(file.originalname);
-                }
-            }
-
-
-        });
-
-        console.log(`Upload finished: ${file.originalname} [${payload.readableSize()}]`);
-        writeResponse(response, 200, {done: true});
-
 
     } catch (err) {
         internalServerErrorResponse(response, err.message);
