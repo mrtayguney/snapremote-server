@@ -117,7 +117,7 @@ function printInfo() {
                             this.image = jsonInfo.image;
                             if (jsonInfo.time_remaining !== '') {
                                 let finishDateTime = moment.utc().add(jsonInfo.timeRemaining * 60 * 1000)
-                                if (finishDateTime.diff(moment.utc(), 'days') > 0)
+                                if (!finishDateTime.isSame(moment(), 'day'))
                                     this.finish_time = finishDateTime.local().format("dddd DD MMM, HH:mm");
                                 else
                                     this.finish_time = finishDateTime.local().format("HH:mm");
