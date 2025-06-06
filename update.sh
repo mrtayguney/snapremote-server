@@ -1,18 +1,25 @@
 #!/bin/bash
 set -e
 
-REPO_URL="https://github.com/mrtayguney/snapremote-server.git"
+REPO="mrtayguney/snapremote-server"
 INSTALL_DIR="snapremote-server"
-SERVICE_NAME="snapremote"
 TMP_DIR="snapremote-tmp"
+SERVICE_NAME="snapremote"
 
-echo "📦 Updating SnapRemote from main branch..."
+echo "📦 Checking latest SnapRemote release..."
 
-# Clean previous temp clone
+# Get latest release tag
+LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep tag_name | cut -d '"' -f4)
+echo "🔖 Latest release: $LATEST_TAG"
+
+# Download and extract latest release
 rm -rf "$TMP_DIR"
-git clone --depth 1 "$REPO_URL" "$TMP_DIR"
+curl -L "https://github.com/$REPO/archive/refs/tags/$LATEST_TAG.tar.gz" -o snapremote.tar.gz
+tar -xzf snapremote.tar.gz
+rm snapremote.tar.gz
+mv "$REPO-$LATEST_TAG" "$TMP_DIR"
 
-# Preserve important files/folders
+# Preserve user files
 for item in ".env" "mainDb.json" "database.json" "files"; do
   if [ -e "$INSTALL_DIR/$item" ]; then
     echo "💾 Preserving $item"
@@ -34,4 +41,4 @@ if systemctl is-enabled --quiet "$SERVICE_NAME"; then
   sudo systemctl restart "$SERVICE_NAME"
 fi
 
-echo "✅ SnapRemote updated from main branch with preserved settings and data."
+echo "✅ SnapRemote updated to release $LATEST_TAG with preserved settings and data."
