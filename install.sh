@@ -6,6 +6,13 @@ set -e
 REPO="mrtayguney/snapremote-server"
 INSTALL_DIR="snapremote-server"
 
+# Initialize Git repo if not already
+if [ ! -d .git ]; then
+  git init
+  git remote add origin https://github.com/mrtayguney/snapremote-server.git
+  echo "✅ Git repo initialized and remote set to origin."
+fi
+
 echo "📦 Installing SnapRemote from latest GitHub release..."
 
 # Get latest release tag from GitHub API

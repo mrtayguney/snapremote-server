@@ -14,14 +14,24 @@
 
 ## ⚙️ Setup
 
-### Easy Installer
+### Installer
 ```bash
 curl -sL https://raw.githubusercontent.com/mrtayguney/snapremote-server/main/install.sh | bash
 ```
 > #### ⚠️ .env parameters
->You will asked to create .env file with some parameters. The parameters are explained bellow.
+>You will be asked to create .env file with some parameters. The parameters are explained bellow.
 
-or do it manually;
+
+###  Update to Latest Version
+
+To update SnapRemote to the latest code from the `main` branch, run:
+
+```bash
+curl -sL https://raw.githubusercontent.com/mrtayguney/snapremote-server/main/update.sh | bash
+```
+---
+
+### Install Manually
 
 #### 1. Clone the Repository
 
@@ -31,7 +41,7 @@ cd snapremote-server
 ```
 
 #### 2. Install the Packages
-You must install Node.js and npm to your device;
+Install Node.js and npm if not already installed:
 ```bash
 sudo apt install npm nodejs
 ```
@@ -60,7 +70,7 @@ WEBCAM_PATH="/dev/video0"     # If you have webcam connected to your server, you
 
 Generate a secret at: [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
 
-You can get your webcam path with the code;
+To find your webcam path, run:
 ```bash
 sudo apt install v4l-utils
 v4l2-ctl --list-devices
@@ -141,7 +151,8 @@ To include full print data (e.g., layer count) in your G-code:
 
 ### Download Script
 
-[convert.py](https://raw.githubusercontent.com/mrtayguney/snapremote-server/refs/heads/main/post_process/convert.py)
+[convert.py](https://raw.githubusercontent.com/mrtayguney/snapremote-server/main/post_process/convert.py
+)
 
 ### Configure in OrcaSlicer
 
