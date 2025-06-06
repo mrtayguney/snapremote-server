@@ -12,12 +12,15 @@ echo "📦 Checking latest SnapRemote release..."
 LATEST_TAG=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep tag_name | cut -d '"' -f4)
 echo "🔖 Latest release: $LATEST_TAG"
 
-# Download and extract latest release
+# Download and extract release
 rm -rf "$TMP_DIR"
 curl -L "https://github.com/$REPO/archive/refs/tags/$LATEST_TAG.tar.gz" -o snapremote.tar.gz
 tar -xzf snapremote.tar.gz
 rm snapremote.tar.gz
-mv "$REPO-$LATEST_TAG" "$TMP_DIR"
+
+# Rename extracted folder
+EXTRACTED_DIR="snapremote-server-$LATEST_TAG"
+mv "$EXTRACTED_DIR" "$TMP_DIR"
 
 # Preserve user files
 for item in ".env" "mainDb.json" "database.json" "files"; do
